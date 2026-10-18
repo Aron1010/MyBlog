@@ -860,7 +860,7 @@ footer .footer-bottom{margin-top:0}
 @media(prefers-reduced-transparency:reduce){.mobile-home-profile .profile-card{background:#eaf4fc}}
 
 /* A little line of photographs drying in the sea breeze. */
-.home-gallery .photo-clothesline{position:relative;isolation:isolate;grid-template-columns:repeat(4,minmax(0,1fr));gap:28px;padding:45px 14px 24px}
+.home-gallery .photo-clothesline{position:relative;isolation:isolate;grid-template-columns:repeat(4,minmax(0,1fr)) max-content;gap:28px;padding:45px 14px 24px}
 .photo-clothesline .photo-rope{position:absolute;top:0;left:0;width:100%;height:44px;overflow:visible;pointer-events:none;z-index:-1;filter:drop-shadow(0 2px 1px rgba(49,88,117,.16))}
 .photo-rope path{fill:none;stroke:#8aa7b9;stroke-width:2;vector-effect:non-scaling-stroke}
 .home-gallery .photo-clothesline .gallery-card{position:relative;transform:rotate(-2deg);transform-origin:50% -20px;border:1px solid rgba(255,255,255,.9);border-radius:9px;padding:8px;background:rgba(242,250,255,.85);box-shadow:0 8px 18px rgba(49,88,117,.13),inset 0 0 0 1px rgba(125,163,188,.1);transition:transform .25s,box-shadow .25s}
@@ -883,8 +883,8 @@ footer .footer-bottom{margin-top:0}
  .home-gallery .photo-clothesline .gallery-card-meta{font-size:9px}
 }
 @media(max-width:720px){
- .home-gallery .photo-clothesline{grid-template-columns:repeat(4,min(72vw,280px));gap:20px;padding:43px 12px 24px;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x proximity;scroll-padding-inline:12px;scrollbar-width:thin;scrollbar-color:rgba(90,137,171,.4) transparent}
- .photo-clothesline .photo-rope{width:calc(4 * min(72vw,280px) + 84px)}
+ .home-gallery .photo-clothesline{grid-template-columns:repeat(4,min(72vw,280px)) max-content;gap:20px;padding:43px 12px 24px;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x proximity;scroll-padding-inline:12px;scrollbar-width:thin;scrollbar-color:rgba(90,137,171,.4) transparent}
+ .photo-clothesline .photo-rope{width:calc(4 * min(72vw,280px) + 246px)}
  .home-gallery .photo-clothesline .gallery-card{scroll-snap-align:start}
  .home-gallery .photo-clothesline .gallery-card-title{font-size:13px}
 }
@@ -895,8 +895,6 @@ footer .footer-bottom{margin-top:0}
 /* Photo viewing controls remain available without visible captions. */
 .gallery-viewer-bottom{display:flex;justify-content:space-between}
 
-/* Keep the gallery entrance at the right edge, outside the scrolling photos. */
-.photo-clothesline-footer{display:flex;justify-content:flex-end;padding:2px 14px 0}
-.gallery-visit-link{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:44px;padding:8px 17px;border:1px solid rgba(255,255,255,.75);border-radius:24px;background:rgba(232,245,255,.72);color:#416d8d;font-size:12px;box-shadow:0 3px 12px rgba(65,109,141,.08);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+/* The gallery entrance shares the same row as the hanging photographs. */
+.gallery-visit-link{align-self:center;white-space:nowrap;scroll-snap-align:end;display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:44px;padding:8px 17px;border:1px solid rgba(255,255,255,.75);border-radius:24px;background:rgba(232,245,255,.72);color:#416d8d;font-size:12px;box-shadow:0 3px 12px rgba(65,109,141,.08);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
 .gallery-visit-link:hover{background:rgba(246,252,255,.94);color:#2f5b7c}
-@media(max-width:720px){.photo-clothesline-footer{padding-right:4px}}
