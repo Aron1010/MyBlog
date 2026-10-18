@@ -3,23 +3,19 @@ import path from 'node:path';
 import vm from 'node:vm';
 import assert from 'node:assert/strict';
 import {parseHTML} from 'linkedom';
-import {root,config,walk,readPost,hash} from './content.mjs';
+import {root,config,walk,readPost} from './content.mjs';
 const dist = path.join(root,'dist');
 const context = {};
 vm.runInNewContext(fs.readFileSync(path.join(root,'assets/posts.js'),'utf8')+';this.posts=BLOG_POSTS;',context);
 const posts = context.posts;
-const audit = process.argv.includes('--migration');
-const manifest = JSON.parse(fs.readFileSync(path.join(root,'migration/manifest.json'),'utf8'));
-assert.equal(manifest.filter(m=>!m.draft).length,32);
-assert.equal(manifest.filter(m=>m.draft).length,13);
-if (audit) assert.equal(posts.length,32,'本次应迁移全部 32 篇正式文章');
-for (const entry of manifest) {
-  const archived = readPost(path.join(root,'migration/source-posts',entry.source));
-  assert.equal(hash(archived.raw),entry.sourceHash,'原始备份完整性: '+entry.source);
-  const current = audit ? readPost(path.join(root,entry.target)) : null;
-  if (audit) assert.equal(hash(current.markdown),entry.migratedBodyHash,'迁移正文完整性: '+entry.source);
-  if (!entry.correction) assert.equal(entry.bodyHash,entry.migratedBodyHash);
-  if (audit && entry.draft) assert(!posts.some(p=>p.source===entry.source),'草稿不得进入公开数据');
+const sourcePosts = walk(path.join(root,'content','posts')).filter(file=>/\.mdx?$/.test(file)).map(file=>({file,...readPost(file)}));
+const publishedSources = sourcePosts.filter(({data})=>data.draft!==true && !data.password);
+assert.equal(posts.length,publishedSources.length,'公开文章数量应与当前内容源一致');
+for (const {file,data,markdown} of publishedSources) {
+  const post = posts.find(post=>post.source===path.relative(path.join(root,'content','posts'),file).split(path.sep).join('/'));
+  assert(post,'正式文章应进入公开数据: '+file);
+  assert.equal(post.id,data.id,'文章 id 应与当前内容源一致: '+file);
+  assert.equal(post.markdown,markdown,'正文应与当前内容源一致: '+file);
 }
 const pages = walk(dist).filter(f=>f.endsWith('.html'));
 const docs = new Map();
@@ -64,9 +60,8 @@ for (const post of posts) {
 const archive=docs.get(path.join(dist,'archive/index.html'));
 assert.equal(archive.querySelectorAll('.archive-row').length,posts.length);
 const counts=Object.fromEntries([...new Set(posts.map(p=>p.category))].map(c=>[c,posts.filter(p=>p.category===c).length]));
-if (audit) assert.deepEqual(counts,{MySQL:4,Redis:22,Linux:6});
 const rss = fs.readFileSync(path.join(dist,'rss.xml'),'utf8');
 assert.equal((rss.match(/<item>/g)||[]).length,posts.length);
 for (const post of posts) assert(rss.includes(encodeURI(config.url+post.url)),'RSS 包含全部文章');
 for (const file of walk(dist)) assert(!/^(?:content|migration|node_modules|output)\/|sample-posts\.json|encrypted-demo/.test(path.relative(dist,file)),'公开产物不得包含草稿或备份');
-console.log(JSON.stringify({published:posts.length,draftsPreserved:13,categories:counts,staticPages:pages.length,internalLinks:checkedLinks,assetReferences:checkedAssets,sourceBodiesVerified:audit?manifest.length:0,rssItems:posts.length},null,2));
+console.log(JSON.stringify({published:posts.length,categories:counts,staticPages:pages.length,internalLinks:checkedLinks,assetReferences:checkedAssets,sourceBodiesVerified:publishedSources.length,rssItems:posts.length},null,2));

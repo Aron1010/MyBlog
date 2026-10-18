@@ -8,7 +8,7 @@
 
 已从旧站源码完整迁移 **32 篇已发布文章**：Linux 6 篇、MySQL 4 篇、Redis 22 篇。保留原始标题、正文、发布日期、更新日期、分类和标签；两篇生活设计示例已从网站中移除。
 
-13 篇草稿或主题演示文档保存在 `content/drafts/`，不会进入公开网站。完整原始文件和图片另存于 `migration/source-posts/`。唯一的正文修正是将「多级缓存学习索引」中不存在的 Lua 文章链接改为文字说明，详情见 [迁移报告](migration/迁移报告.md)。
+迁移已经完成，正式文章以 `content/posts/` 中的 Markdown 为内容源。`migration/` 仅保存历史备份和迁移报告，不参与构建或检查，可以删除。迁移时将「多级缓存学习索引」中不存在的 Lua 文章链接改为了文字说明。
 
 站点不再读取旧项目，文章 Markdown 是独立内容源。
 
@@ -53,9 +53,9 @@ python3 build_preview.py
 - **流程图**：支持 Mermaid flowchart 与 sequenceDiagram，页面使用本地图表脚本，附带可展开的源码。没有外部 CDN 依赖。
 - **配置**：站名、作者、正式域名、简介、联系信息位于 `site.config.json`。
 - **音乐**：放入上级 `music/` 后运行 `python3 prepare_music.py` 更新资源，再构建。音乐与歌词在站内路由切换时保持播放，不自动播放。
-- **发布前**：运行构建、检查，再更新离线预览。单独运行 `build_preview.py` 不重新编译 Markdown。`npm run check:migration` 额外核对本次迁移的 32 篇文章和 13 篇草稿正文哈希，文章日后修订后使用普通 `npm run check`。
+- **发布前**：运行构建、检查，再更新离线预览。单独运行 `build_preview.py` 不重新编译 Markdown。`npm run check` 根据当前正式文章检查正文、静态页面、站内链接、资源及 RSS。
 
-`import_posts.py` 仅用于首次迁移；检测到 `content/` 后会拒绝覆盖。日常写作使用 `npm run build`，不需要再访问旧站源码。
+首次迁移脚本和迁移专用校验命令已移除。日常写作使用 `npm run build` 和 `npm run check`，不需要旧站源码或迁移备份。
 
 ## 网站功能
 
@@ -69,7 +69,7 @@ python3 build_preview.py
 | --- | --- |
 | `content/posts/` | 正式文章，主要维护入口 |
 | `content/drafts/` | 未公开草稿，不进入构建 |
-| `migration/` | 原始备份、校验清单、迁移报告，不公开 |
+| `migration/`（可删除） | 历史备份、校验清单和迁移报告，不参与构建或检查 |
 | `scripts/` | 文章处理、静态生成、完整性检查 |
 | `dist/` | 构建生成的公开网站 |
 | `index.html`、`app.js`、`style.css` | 页面壳、交互与样式 |
