@@ -23,6 +23,11 @@ const MUSIC_MEDIA = {};
   audio.volume = Number.isFinite(settings.volume) ? Math.max(0, Math.min(1, settings.volume)) : .45;
   let lastVolume = audio.volume || .45, message = '', pendingSeek = null;
   const expanded = new Map();
+  const desktopLayout = window.matchMedia('(min-width: 721px)');
+  const navbarPanels = {desktop:{list:true},mobile:{}};
+  function panelsFor(root) {
+    return root.dataset.musicPlayer === 'navbar' ? navbarPanels[desktopLayout.matches ? 'desktop' : 'mobile'] : expanded.get(root.dataset.musicPlayer) || {};
+  }
   const modeLabels = {sequence:'顺序播放', repeat:'单曲循环', shuffle:'随机播放'};
   const roots = () => [...document.querySelectorAll('[data-music-player]')];
   const mediaPath = src => (document.documentElement.dataset.routing === 'path' && location.protocol !== 'file:' ? '/' : '') + src;
@@ -37,7 +42,7 @@ const MUSIC_MEDIA = {};
   function markup(context) {
     const track = tracks[index];
     const key = context === '侧边栏' ? 'sidebar' : 'navbar';
-    return `<section class="music-player" data-music-player="${key}" data-music-context="${context}" aria-label="${context}音乐播放器"><div class="music-heading"><h3>听一会儿</h3><span>${tracks.length} 首收藏</span></div><div class="music-track"><img class="music-cover" src="${cover(track)}" alt="${escape(track.title)} 封面"><div class="music-info"><h4 data-music-title>${escape(track.title)}</h4><p data-music-artist>${escape(track.artist)}</p></div></div><div class="music-progress"><label class="sr-only" for="music-seek-${key}">${context} 播放进度</label><input id="music-seek-${key}" type="range" min="0" max="${track.duration}" step=".1" value="0" data-music-seek><div class="music-time"><span data-music-time>0:00</span><span data-music-duration>${clock(track.duration)}</span></div></div><div class="music-controls">${button('mode','播放模式：' + modeLabels[mode],mode,context)}${button('previous','上一首','previous',context)}${button('play','播放','play',context)}${button('next','下一首','next',context)}${button('list','播放列表','list',context,`aria-expanded="false" aria-controls="music-list-${key}"`)}</div><div class="music-secondary"><div class="music-volume">${button('mute','静音','volume',context)}<label class="sr-only" for="music-volume-${key}">${context} 音量</label><input id="music-volume-${key}" type="range" min="0" max="100" step="1" value="${Math.round(audio.volume*100)}" data-music-volume></div><button type="button" class="music-lyrics-button" data-music-action="lyrics" aria-expanded="false" aria-controls="music-lyrics-${key}">${icon('lyrics')}歌词</button></div><p class="music-status" data-music-status role="status" hidden></p><div class="music-lyrics" id="music-lyrics-${key}" hidden><p data-lyric-before></p><p data-lyric-current></p><p data-lyric-after></p></div><ol class="music-playlist" id="music-list-${key}" hidden>${tracks.map((t,i)=>`<li><button type="button" data-music-track="${i}"><span class="music-number">${String(i+1).padStart(2,'0')}</span><span><strong>${escape(t.title)}</strong><small>${escape(t.artist)}</small></span><span>${clock(t.duration)}</span></button></li>`).join('')}</ol></section>`;
+    return `<section class="music-player" data-music-player="${key}" data-music-context="${context}" aria-label="${context}音乐播放器"><div class="music-heading"><h3>听一会儿</h3><span>${tracks.length} 首收藏</span></div><div class="music-track"><img class="music-cover" src="${cover(track)}" alt="${escape(track.title)} 封面"><div class="music-info"><h4 data-music-title>${escape(track.title)}</h4><p data-music-artist>${escape(track.artist)}</p></div></div><div class="music-progress"><label class="sr-only" for="music-seek-${key}">${context} 播放进度</label><input id="music-seek-${key}" type="range" min="0" max="${track.duration}" step=".1" value="0" data-music-seek><div class="music-time"><span data-music-time>0:00</span><span data-music-duration>${clock(track.duration)}</span></div></div><div class="music-controls">${button('mode','播放模式：' + modeLabels[mode],mode,context)}${button('previous','上一首','previous',context)}${button('play','播放','play',context)}${button('next','下一首','next',context)}${button('list','播放列表','list',context,`aria-expanded="false" aria-controls="music-list-${key}"`)}</div><div class="music-secondary"><div class="music-volume">${button('mute','静音','volume',context)}<label class="sr-only" for="music-volume-${key}">${context} 音量</label><input id="music-volume-${key}" type="range" min="0" max="100" step="1" value="${Math.round(audio.volume*100)}" data-music-volume></div><button type="button" class="music-lyrics-button" data-music-action="lyrics" aria-expanded="false" aria-controls="music-lyrics-${key}">${icon('lyrics')}歌词</button></div><p class="music-status" data-music-status role="status" hidden></p><div class="music-lyrics" id="music-lyrics-${key}" hidden><p data-lyric-before></p><p data-lyric-current></p><p data-lyric-after></p></div><ol class="music-playlist" id="music-list-${key}" hidden>${tracks.map((t,i)=>`<li><button type="button" data-music-track="${i}"><span class="music-number">${String(i+1).padStart(2,'0')}</span><img class="music-list-cover" src="${cover(t)}" alt="" loading="lazy"><span class="music-list-info"><strong>${escape(t.title)}</strong><small>${escape(t.artist)}</small></span><span>${clock(t.duration)}</span></button></li>`).join('')}</ol></section>`;
   }
   function syncTime() {
     const time = audio.currentTime || 0, total = duration();
@@ -60,7 +65,7 @@ const MUSIC_MEDIA = {};
   function refresh() {
     const track = tracks[index], playing = !audio.paused;
     roots().forEach(root => {
-      const context = root.dataset.musicContext, panels = expanded.get(root.dataset.musicPlayer) || {};
+      const context = root.dataset.musicContext, panels = panelsFor(root);
       root.querySelector('[data-music-title]').textContent = track.title;
       root.querySelector('[data-music-artist]').textContent = track.artist;
       const artwork = root.querySelector('.music-cover');
@@ -72,6 +77,7 @@ const MUSIC_MEDIA = {};
       const modeButton = root.querySelector('[data-music-action="mode"]');
       modeButton.innerHTML = icon(mode);
       modeButton.setAttribute('aria-label',context + ' 播放模式：' + modeLabels[mode]);
+      modeButton.dataset.mode = mode;
       const mute = root.querySelector('[data-music-action="mute"]');
       mute.innerHTML = icon(audio.volume === 0 ? 'muted':'volume');
       mute.setAttribute('aria-label',context + (audio.volume === 0 ? ' 取消静音':' 静音'));
@@ -127,8 +133,10 @@ const MUSIC_MEDIA = {};
     if (action === 'mode') { const modes=['sequence','repeat','shuffle']; mode=modes[(modes.indexOf(mode)+1)%modes.length]; save(); refresh(); }
     if (action === 'mute') { if (audio.volume) {lastVolume=audio.volume; audio.volume=0;} else audio.volume=lastVolume; }
     if (action === 'list' || action === 'lyrics') {
-      const panels = expanded.get(root.dataset.musicPlayer) || {};
-      panels[action] = !panels[action]; expanded.set(root.dataset.musicPlayer,panels); refresh();
+      const panels = panelsFor(root);
+      panels[action] = !panels[action];
+      if (root.dataset.musicPlayer !== 'navbar') expanded.set(root.dataset.musicPlayer,panels);
+      refresh();
     }
   });
   document.addEventListener('input', event => {
@@ -150,6 +158,7 @@ const MUSIC_MEDIA = {};
   const panel = document.querySelector('#music-panel');
   panel.innerHTML = `<button class="music-panel-close" type="button" popovertarget="music-panel" popovertargetaction="hide" aria-label="关闭音乐播放器">×</button>` + markup('顶部');
   panel.addEventListener('toggle',()=>document.querySelector('#music-open').setAttribute('aria-expanded',String(panel.matches(':popover-open'))));
+  if (!window.__PRERENDER__) desktopLayout.addEventListener('change',refresh);
   window.BlogMusic = {markup,refresh};
   select(index,false);
 })();

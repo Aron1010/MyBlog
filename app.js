@@ -101,11 +101,14 @@ function card(e) {
 function filters() {
   return `<div class="filter-row" role="group" aria-label="文章分类">${categories.map(c => `<button data-filter="${esc(c)}" class="${selected === c ? 'active' : ''}" aria-pressed="${selected === c}">${esc(c)}</button>`).join('')}</div>`;
 }
+function profileCard() {
+  return `<section class="profile-card"><img class="profile-avatar" src="${imageSrc('aron')}" alt="Aron 的头像"><h2>Hello, I'm Aron.</h2><p>持续学习，也认真生活。<br>记录后端开发、AI 编程，<br>以及折腾个人网站的点滴。</p><div class="profile-stats"><a href="#archive"><strong>${realPosts.length}</strong><span>篇文章</span></a><a href="#diary"><strong>${new Set(realPosts.map(e => e.category)).size}</strong><span>个分类</span></a><a href="#gallery"><strong>${photos.length}</strong><span>张插画</span></a></div><div class="profile-social"><a href="${esc(SITE_CONFIG.github)}" target="_blank" rel="noopener">GitHub ↗</a><a href="mailto:${esc(SITE_CONFIG.email)}">Email ↗</a></div></section>`;
+}
 function sidebar() {
   const counts = new Map();
   realPosts.forEach(p => p.tags.forEach(t => counts.set(t, (counts.get(t) || 0) + 1)));
   const tags = [...counts].sort((a,b)=>b[1]-a[1] || a[0].localeCompare(b[0],'zh-CN')).slice(0,12).map(([t])=>t);
-  return `<aside class="sidebar"><section class="profile-card"><img class="profile-avatar" src="${imageSrc('aron')}" alt="Aron 的头像"><h2>Hello, I'm Aron.</h2><p>持续学习，也认真生活。<br>记录后端开发、AI 编程，<br>以及折腾个人网站的点滴。</p><div class="profile-stats"><a href="#archive"><strong>${realPosts.length}</strong><span>篇文章</span></a><a href="#diary"><strong>${new Set(realPosts.map(e => e.category)).size}</strong><span>个分类</span></a><a href="#gallery"><strong>${photos.length}</strong><span>张插画</span></a></div><div class="profile-social"><a href="${esc(SITE_CONFIG.github)}" target="_blank" rel="noopener">GitHub ↗</a><a href="mailto:${esc(SITE_CONFIG.email)}">Email ↗</a></div></section><div class="music-card">${BlogMusic.markup('侧边栏')}</div><section class="sidebar-block"><h3>沿着兴趣，慢慢读 <span>↗</span></h3>${categories.filter(c=>c !== '全部').map(c => `<a class="category-row" href="#category/${c}"><span>${c}</span><span>${realPosts.filter(e => e.category === c).length} 篇</span></a>`).join('')}</section><section class="sidebar-block"><h3>标签 <span>#</span></h3><div class="tag-cloud">${tags.map(tagLink).join('')}</div></section></aside>`;
+  return `<aside class="sidebar">${profileCard()}<div class="music-card">${BlogMusic.markup('侧边栏')}</div><section class="sidebar-block"><h3>沿着兴趣，慢慢读 <span>↗</span></h3>${categories.filter(c=>c !== '全部').map(c => `<a class="category-row" href="#category/${c}"><span>${c}</span><span>${realPosts.filter(e => e.category === c).length} 篇</span></a>`).join('')}</section><section class="sidebar-block"><h3>标签 <span>#</span></h3><div class="tag-cloud">${tags.map(tagLink).join('')}</div></section></aside>`;
 }
 function filteredPosts() { return entries.filter(e => (selected === '全部' || e.category === selected) && (!activeTag || e.tags.includes(activeTag))); }
 function diary() {
@@ -136,7 +139,7 @@ function topics() {
   return `<div class="content topics-page"><div class="view-intro"><div class="kicker">EXPLORE BY TOPIC</div><h1>沿着兴趣，慢慢读。</h1><p>${topicEntries.length} 个专题 · ${realPosts.length} 篇学习笔记</p></div><div class="topic-grid">${topicEntries.map(([name, description]) => { const posts = realPosts.filter(e => e.category === name); return `<section class="topic-card"><div class="topic-heading"><h2><a href="#category/${name}">${name}</a></h2><span>${posts.length} 篇文章</span></div><p>${description}</p><ul>${posts.slice(0,4).map(e => `<li><a href="#post/${e.id}">${esc(e.title)} <span aria-hidden="true">↗</span></a></li>`).join('')}</ul><a class="topic-more" href="#category/${name}">查看全部 ${posts.length} 篇 <span aria-hidden="true">→</span></a></section>`; }).join('')}</div></div>`;
 }
 function home() {
-  return `<div class="hero-wrap"><section class="hero hero-breeze" aria-label="杏菜与海风主题首页"><div class="cinema-copy"><div class="kicker">A LITTLE CORNER OF MY WORLD</div><h1>认真生活，<br><em>也慢慢记录。</em></h1><p>我是 Aron，记录学习与生活。<br>在平凡日子里，收藏一点喜欢。</p><a class="cinema-link" href="#diary">从一篇文章开始 <span aria-hidden="true">↗</span></a></div><span class="cinema-caption">Stay curious. Stay gentle.</span><button class="hero-scroll" type="button" data-home-scroll aria-label="向下浏览文章"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 9 7 7 7-7"/></svg></button></section></div><div class="content">${diary()}${featuredGallery()}</div>`;
+  return `<div class="hero-wrap"><section class="hero hero-breeze" aria-label="杏菜与海风主题首页"><div class="cinema-copy"><div class="kicker">A LITTLE CORNER OF MY WORLD</div><h1>认真生活，<br><em>也慢慢记录。</em></h1><p>我是 Aron，记录学习与生活。<br>在平凡日子里，收藏一点喜欢。</p><a class="cinema-link" href="#diary">从一篇文章开始 <span aria-hidden="true">↗</span></a></div><span class="cinema-caption">Stay curious. Stay gentle.</span><button class="hero-scroll" type="button" data-home-scroll aria-label="向下浏览文章"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 9 7 7 7-7"/></svg></button></section></div><div class="content"><div class="mobile-home-profile" aria-label="关于 Aron">${profileCard()}</div>${diary()}${featuredGallery()}</div>`;
 }
 function archive() {
   let month = '';
@@ -261,7 +264,12 @@ async function renderDiagrams() {
   }
 }
 
+function closeMobileMenu() {
+  const menu = document.querySelector('#mobile-menu');
+  menu?.hidePopover();
+}
 function render(scroll = true) {
+  if (!window.__PRERENDER__) closeMobileMenu();
   const {path: route, params, value} = routeInfo();
   selected = route.startsWith('category/') ? value : route === 'home' ? params.get('category') || '全部' : '全部';
   activeTag = route.startsWith('tag/') ? value : '';
@@ -316,6 +324,20 @@ function updateProgress() {
   document.querySelector('#back-top')?.classList.toggle('visible', scrollY > 400);
 }
 if (!window.__PRERENDER__) {
+const mobileMenu = document.querySelector('#mobile-menu');
+const menuToggle = document.querySelector('#menu-open');
+menuToggle.addEventListener('click', () => {
+  document.querySelector('#music-panel').hidePopover();
+});
+mobileMenu.addEventListener('toggle', event => {
+  menuToggle.setAttribute('aria-expanded', String(event.newState === 'open'));
+  if (event.newState === 'closed') mobileMenu.querySelectorAll('details[open]').forEach(group => { group.open = false; });
+});
+mobileMenu.addEventListener('click', event => {
+  const link = event.target.closest('a[href]');
+  if (link && event.button === 0 && !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey) closeMobileMenu();
+});
+window.addEventListener('resize', () => { if (matchMedia('(min-width: 721px)').matches) closeMobileMenu(); });
 window.addEventListener('scroll', () => {
   if (scrollFrame) return;
   scrollFrame = requestAnimationFrame(() => { scrollFrame = 0; updateProgress(); saveView(); });
@@ -350,7 +372,10 @@ document.addEventListener('click', async event => {
     return;
   }
   if (event.target.closest('#back-top')) window.scrollTo({top: 0, behavior: motion()});
-  if (event.target.closest('[data-home-scroll]')) main.querySelector('#diary-section')?.scrollIntoView({behavior: motion(), block: 'start'});
+  if (event.target.closest('[data-home-scroll]')) {
+    const nextSection = matchMedia('(max-width: 720px)').matches ? main.querySelector('.mobile-home-profile') : main.querySelector('#diary-section');
+    nextSection?.scrollIntoView({behavior: motion(), block: 'start'});
+  }
   const copy = event.target.closest('[data-copy]');
   if (copy) { const code = copy.closest('.code-block').querySelector('code').textContent; try { await navigator.clipboard.writeText(code); copy.textContent = '已复制'; setTimeout(() => { if (copy.isConnected) copy.textContent = '复制'; }, 1800); } catch { const range = document.createRange(); range.selectNodeContents(copy.closest('.code-block').querySelector('code')); const selection = getSelection(); selection.removeAllRanges(); selection.addRange(range); toast('代码已选中，按 ⌘C / Ctrl+C 复制'); } }
   const close = event.target.closest('[data-close]'); if (close) close.closest('dialog').close();
