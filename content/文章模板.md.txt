@@ -1,0 +1,17 @@
+---
+title: 文章标题
+description: 用一两句话说明这篇文章记录的问题和主要内容。
+published: 2026-10-18
+updated: 2026-10-18
+category: 生活
+tags: [随记]
+draft: true
+id: my-first-daily-note
+permalink: /posts/life/my-first-daily-note/
+image: anna-bookshop
+author: Aron
+---
+
+## 今天的记录
+
+在这里开始写作。复制模板到 content/posts/生活/新文章.md，并在准备好发布时将 draft 改为 false。
