@@ -1,0 +1,17 @@
+{
+  "name": "qingfeng-daily",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Aron 的清风日常：独立静态个人博客",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "check": "node scripts/check.mjs",
+    "preview": "python3 -m http.server 4174 --bind 127.0.0.1 --directory dist",
+    "check:migration": "node scripts/check.mjs --migration"
+  },
+  "devDependencies": {
+    "@mermaid-js/tiny": "12.2.0",
+    "linkedom": "0.18.13",
+    "yaml": "2.9.1"
+  }
+}
