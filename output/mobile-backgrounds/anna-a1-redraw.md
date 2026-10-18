@@ -1,0 +1,9 @@
+# 积云下的杏菜：手机背景重绘
+
+原图：`/Users/aron/blog/Firefly/src/assets/images/MobileWallpaper/a1.avif`
+
+工具：内置 image_gen。原始生成文件保存在 `anna-a1-redrawn.png`，网站使用优化后的 `../../assets/anna-mobile-clouds.jpg`。手机端（宽度 ≤ 720px）使用该图，CSS 负责轻遮罩与居中 cover 裁切。
+
+## 完整提示词
+
+Use case: style-transfer / identity-preserve. Input image 1 is the EDIT TARGET. Redraw this exact illustration as a refined high-resolution anime illustration for a mobile blog background. Preserve the same Anna Yanami (八奈见杏菜) identity, recognizable navy-blue bob-length hair and small ahoge, blue eyes, quiet thoughtful slightly serious expression, three-quarter view looking toward the left, white short-sleeved blouse with exactly four chest bows alternating blue, yellow, blue, yellow. Preserve the bust portrait anchored in the lower center and the original pose, clothing, and large towering summer cumulonimbus clouds filling the sky behind and above her. Preserve the original portrait composition and approximate 2:3 aspect ratio. Improve the clarity of the linework, natural facial anatomy, strands of hair, fabric folds, and softly sculpted cloud light and shadow; polished clean Japanese anime rendering with subtle painterly environmental detail, not photorealism. Keep the large upper half entirely sky and white clouds, spacious and quiet enough for website copy. Colors: soft cyan, pale sky blue and white, restrained saturation; retain blue cloud shadows and the original bright summer mood, no dramatic darkening. Keep face comfortably inside the middle 50 percent of the width for narrow phone cropping. This is a single full-bleed background illustration, not a UI mockup. Do not introduce new objects, scenery, people, text, logos, watermark, frame, or collage. Do not change her to a smiling pose or add accessories. Keep original image intact; produce a separate newly redrawn output.
