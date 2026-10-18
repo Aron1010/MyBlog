@@ -116,7 +116,7 @@ function diary() {
   return `<section id="diary-section" class="diary-section"><div class="diary-heading"><div class="section-top"><div><div class="kicker">NOTES, DAYS & LITTLE DISCOVERIES</div><h2 class="section-title">${activeTag ? '# ' + esc(activeTag) : selected === '全部' ? '最近更新' : esc(selected)} <span class="post-count">${list.length} 篇</span></h2></div><p class="latest-note">LATEST NOTE / <time datetime="${realPosts[0].date}">${date(realPosts[0].date)}</time></p></div>${filters()}${activeTag ? '<button id="clear-tag" class="clear-filter">清除标签筛选 ×</button>' : ''}</div><div class="diary-layout"><div class="blog-list">${list.length ? list.slice(0, limit).map(card).join('') : '<p class="empty">这个标签下暂时还没有文章。<a href="#diary">查看全部文章 ↗</a></p>'}${list.length > limit ? '<button class="more-button" id="load-more">再翻几页 ↓</button>' : '<p class="list-end">— 读到这里，歇一小会儿 ☁ —</p>'}</div>${sidebar()}</div></section>`;
 }
 function galleryCard(p, i) {
-  return `<button type="button" class="gallery-card" data-photo="${i}" aria-label="查看大图：${esc(p.title)}"><figure><div class="gallery-art"><img src="${imageSrc(p.image)}" alt="${esc(p.title)} · 八奈见杏菜主题插画" loading="lazy"><span class="gallery-expand" aria-hidden="true">↗</span></div><figcaption><span class="gallery-card-title">${esc(p.title)}</span><span class="gallery-card-meta"><span>${esc(p.label)}</span><span>${String(i + 1).padStart(2, '0')}</span></span></figcaption></figure></button>`;
+  return `<button type="button" class="gallery-card" data-photo="${i}" aria-label="查看大图：${esc(p.title)}"><figure><div class="gallery-art"><img src="${imageSrc(p.image)}" alt="${esc(p.title)} · 八奈见杏菜主题插画" loading="lazy"><span class="gallery-expand" aria-hidden="true">↗</span></div></figure></button>`;
 }
 let activePhoto = 0;
 function showPhoto(index, open = false) {
@@ -125,13 +125,11 @@ function showPhoto(index, open = false) {
   const image = document.querySelector('#large-image');
   image.src = imageSrc(photo.image);
   image.alt = photo.title + ' · 八奈见杏菜主题插画';
-  document.querySelector('#image-caption').textContent = photo.title;
-  document.querySelector('#image-counter').textContent = (activePhoto + 1) + ' / ' + photos.length + ' · ' + photo.label;
   if (open) document.querySelector('#image-dialog').showModal();
 }
 function featuredGallery() {
   const featured = [0, 1, 7, 8];
-  return `<section class="gallery-section home-gallery" aria-labelledby="home-gallery-title"><div class="section-top"><div><div class="kicker">ANNA / A GALLERY OF LITTLE DAYS</div><h2 class="section-title" id="home-gallery-title">杏菜集 · 收藏一点晴朗</h2></div><a class="section-link" href="#gallery">全部 ${photos.length} 张插画 ↗</a></div><div class="gallery-grid gallery-preview photo-clothesline" role="region" aria-label="晾晒晴天照片，可横向滚动" tabindex="0"><svg class="photo-rope" viewBox="0 0 1200 44" preserveAspectRatio="none" aria-hidden="true"><path d="M0 10 Q600 40 1200 10"/></svg>${featured.map(i => galleryCard(photos[i], i)).join('')}</div></section>`;
+  return `<section class="gallery-section home-gallery" aria-label="晴天照片墙"><div class="gallery-grid gallery-preview photo-clothesline" role="region" aria-label="晾晒晴天照片，可横向滚动" tabindex="0"><svg class="photo-rope" viewBox="0 0 1200 44" preserveAspectRatio="none" aria-hidden="true"><path d="M0 10 Q600 40 1200 10"/></svg>${featured.map(i => galleryCard(photos[i], i)).join('')}</div><div class="photo-clothesline-footer"><a class="gallery-visit-link" href="#gallery">前往杏菜集 <span aria-hidden="true">↗</span></a></div></section>`;
 }
 function topics() {
   const descriptions = {Linux:'从目录与路径到网络排查，记下日常使用的基础与方法。', MySQL:'梳理数据库基础、SQL 查询、多表关联、权限与事务。', Redis:'从数据结构到分布式锁、多级缓存和集群，记录缓存的原理与实践。'};
