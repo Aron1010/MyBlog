@@ -131,7 +131,7 @@ function showPhoto(index, open = false) {
 }
 function featuredGallery() {
   const featured = [0, 1, 7, 8];
-  return `<section class="gallery-section home-gallery" aria-labelledby="home-gallery-title"><div class="section-top"><div><div class="kicker">ANNA / A GALLERY OF LITTLE DAYS</div><h2 class="section-title" id="home-gallery-title">杏菜集 · 收藏一点晴朗</h2></div><a class="section-link" href="#gallery">全部 ${photos.length} 张插画 ↗</a></div><div class="gallery-grid gallery-preview">${featured.map(i => galleryCard(photos[i], i)).join('')}</div></section>`;
+  return `<section class="gallery-section home-gallery" aria-labelledby="home-gallery-title"><div class="section-top"><div><div class="kicker">ANNA / A GALLERY OF LITTLE DAYS</div><h2 class="section-title" id="home-gallery-title">杏菜集 · 收藏一点晴朗</h2></div><a class="section-link" href="#gallery">全部 ${photos.length} 张插画 ↗</a></div><div class="gallery-grid gallery-preview photo-clothesline" role="region" aria-label="晾晒晴天照片，可横向滚动" tabindex="0"><svg class="photo-rope" viewBox="0 0 1200 44" preserveAspectRatio="none" aria-hidden="true"><path d="M0 10 Q600 40 1200 10"/></svg>${featured.map(i => galleryCard(photos[i], i)).join('')}</div></section>`;
 }
 function topics() {
   const descriptions = {Linux:'从目录与路径到网络排查，记下日常使用的基础与方法。', MySQL:'梳理数据库基础、SQL 查询、多表关联、权限与事务。', Redis:'从数据结构到分布式锁、多级缓存和集群，记录缓存的原理与实践。'};
