@@ -129,7 +129,7 @@ function showPhoto(index, open = false) {
 }
 function featuredGallery() {
   const featured = [0, 1, 7, 8];
-  return `<section class="gallery-section home-gallery" aria-label="晴天照片墙"><div class="gallery-grid gallery-preview photo-clothesline" role="region" aria-label="晾晒晴天照片，可横向滚动" tabindex="0"><svg class="photo-rope" viewBox="0 0 1200 44" preserveAspectRatio="none" aria-hidden="true"><path d="M0 10 Q600 40 1200 10"/></svg>${featured.map(i => galleryCard(photos[i], i)).join('')}</div><div class="photo-clothesline-footer"><a class="gallery-visit-link" href="#gallery">前往杏菜集 <span aria-hidden="true">↗</span></a></div></section>`;
+  return `<section class="gallery-section home-gallery" aria-label="晴天照片墙"><div class="gallery-grid gallery-preview photo-clothesline" role="region" aria-label="晾晒晴天照片，可横向滚动" tabindex="0"><svg class="photo-rope" viewBox="0 0 1200 44" preserveAspectRatio="none" aria-hidden="true"><path d="M0 10 Q600 40 1200 10"/></svg>${featured.map(i => galleryCard(photos[i], i)).join('')}<a class="gallery-visit-link" href="#gallery">前往杏菜集 <span aria-hidden="true">↗</span></a></div></section>`;
 }
 function topics() {
   const descriptions = {Linux:'从目录与路径到网络排查，记下日常使用的基础与方法。', MySQL:'梳理数据库基础、SQL 查询、多表关联、权限与事务。', Redis:'从数据结构到分布式锁、多级缓存和集群，记录缓存的原理与实践。'};
