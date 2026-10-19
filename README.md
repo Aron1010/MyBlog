@@ -81,3 +81,7 @@ python3 build_preview.py
 9 幅杏菜主题画面为 AI 辅助绘制，提示词与原始图位于 `output/gallery/`；海风背景原图位于 `output/seaside-breeze-background.png`。头像、歌曲及封面沿用个人项目资源。
 
 Markdown 使用 [Marked](https://github.com/markedjs/marked)，代码高亮使用 [highlight.js](https://highlightjs.org/)，图表使用 [Mermaid Tiny](https://mermaid.js.org/config/usage.html)。构建依赖版本固定于 `package-lock.json`。
+
+## 杏菜集图片维护
+
+杏菜集保留原有 9 张主题插画，新增从本地 `../ya/` 整理的 96 张收藏图片，共 105 张。新增图片数据及来源链接保存在 `assets/gallery/photos.js`，列表使用 `assets/gallery/thumbnails/` 中的 WebP 缩略图，点击后加载 `assets/gallery/full/` 大图。原始文件仍保存在 `../ya/`，构建和部署只读取站内副本。图片下方不显示文字，移动端和桌面端都支持大图切换。

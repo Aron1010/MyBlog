@@ -9,6 +9,10 @@ images = {
     path.stem: "data:image/jpeg;base64," + base64.b64encode(path.read_bytes()).decode()
     for path in (root / "assets").glob("*.jpg")
 }
+images.update({
+    path.relative_to(root).as_posix(): "data:image/webp;base64," + base64.b64encode(path.read_bytes()).decode()
+    for path in (root / "assets" / "gallery").rglob("*.webp")
+})
 html = (root / "index.html").read_text()
 css = (root / "style.css").read_text()
 js = (root / "app.js").read_text()
@@ -19,7 +23,7 @@ for name, uri in images.items():
     js = js.replace('src="assets/' + name + '.jpg"', 'src="' + uri + '"')
 html = html.replace('<link rel="stylesheet" href="style.css">', '<style>' + css + '</style>')
 scripts = []
-for source in ["assets/marked.min.js", "assets/highlight.min.js", "assets/posts.js", "assets/music/tracks.js", "music.js", "app.js"]:
+for source in ["assets/marked.min.js", "assets/highlight.min.js", "assets/posts.js", "assets/music/tracks.js", "assets/gallery/photos.js", "music.js", "app.js"]:
     html = html.replace('<script src="' + source + '" defer></script>', '')
     content = js if source == "app.js" else (root / source).read_text()
     if source == "music.js":
@@ -35,8 +39,10 @@ for source in ["assets/marked.min.js", "assets/highlight.min.js", "assets/posts.
 html = html.replace('</body>', ''.join(scripts) + '</body>')
 output = root / "清风日常.html"
 output.write_text(html)
-# Keep earlier preview links usable with the current branding.
-(root / "晴天手帐.html").write_text(html)
+# Update the legacy preview only when it is still present.
+legacy_preview = root / "晴天手帐.html"
+if legacy_preview.exists():
+    legacy_preview.write_text(html)
 assert '<script src=' not in html
 assert '<link rel="stylesheet"' not in html
 assert not re.search(r'src="assets/', html)

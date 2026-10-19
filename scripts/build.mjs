@@ -18,7 +18,7 @@ fs.cpSync(path.join(root,'assets'),path.join(output,'assets'),{recursive:true});
 const original = fs.readFileSync(path.join(root,'index.html'),'utf8');
 const template = original.replace('data-routing="hash"','data-routing="path"').replaceAll('src="assets/','src="/assets/').replaceAll('href="assets/','href="/assets/').replace('href="style.css"','href="/style.css"').replace('src="music.js"','src="/music.js"').replace('src="app.js"','src="/app.js"');
 const app = fs.readFileSync(path.join(root,'app.js'),'utf8');
-const sources = ['assets/posts.js','assets/music/tracks.js','music.js'].map(file=>[file,fs.readFileSync(path.join(root,file),'utf8')]);
+const sources = ['assets/posts.js','assets/music/tracks.js','assets/gallery/photos.js','music.js'].map(file=>[file,fs.readFileSync(path.join(root,file),'utf8')]);
 const categories = [...new Set(posts.map(p=>p.category))];
 const tags = [...new Set(posts.flatMap(p=>p.tags))];
 const routes = ['/', '/articles/', '/topics/', '/archive/', '/gallery/', '/about/', ...posts.map(p=>p.url), ...categories.map(c=>'/categories/'+encodeURIComponent(c)+'/'), ...tags.map(t=>'/tags/'+encodeURIComponent(t)+'/')];

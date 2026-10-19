@@ -898,3 +898,6 @@ footer .footer-bottom{margin-top:0}
 /* The gallery entrance shares the same row as the hanging photographs. */
 .gallery-visit-link{align-self:center;white-space:nowrap;scroll-snap-align:end;display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:44px;padding:8px 17px;border:1px solid rgba(255,255,255,.75);border-radius:24px;background:rgba(232,245,255,.72);color:#416d8d;font-size:12px;box-shadow:0 3px 12px rgba(65,109,141,.08);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
 .gallery-visit-link:hover{background:rgba(246,252,255,.94);color:#2f5b7c}
+
+/* Collection thumbnails show each complete composition, including portraits. */
+.gallery-collection .gallery-art img{object-fit:contain}
