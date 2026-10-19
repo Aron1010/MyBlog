@@ -24,7 +24,7 @@ export function compile() {
   const posts = [];
   for (const file of walk(path.join(root,'content','posts')).filter(f => /\.mdx?$/.test(f))) {
     const {data,markdown} = readPost(file);
-    if (data.draft === true || data.password) continue;
+    if (config.showPosts === false || data.draft === true || data.password) continue;
     const relative = path.relative(path.join(root,'content','posts'),file).split(path.sep).join('/');
     const id = data.id;
     const permalink = data.permalink;

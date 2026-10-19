@@ -9,7 +9,7 @@ const context = {};
 vm.runInNewContext(fs.readFileSync(path.join(root,'assets/posts.js'),'utf8')+';this.posts=BLOG_POSTS;',context);
 const posts = context.posts;
 const sourcePosts = walk(path.join(root,'content','posts')).filter(file=>/\.mdx?$/.test(file)).map(file=>({file,...readPost(file)}));
-const publishedSources = sourcePosts.filter(({data})=>data.draft!==true && !data.password);
+const publishedSources = sourcePosts.filter(({data})=>config.showPosts!==false && data.draft!==true && !data.password);
 assert.equal(posts.length,publishedSources.length,'公开文章数量应与当前内容源一致');
 for (const {file,data,markdown} of publishedSources) {
   const post = posts.find(post=>post.source===path.relative(path.join(root,'content','posts'),file).split(path.sep).join('/'));
@@ -60,6 +60,12 @@ for (const post of posts) {
 const archive=docs.get(path.join(dist,'archive/index.html'));
 assert.equal(archive.querySelectorAll('.archive-row').length,posts.length);
 const counts=Object.fromEntries([...new Set(posts.map(p=>p.category))].map(c=>[c,posts.filter(p=>p.category===c).length]));
+if (config.showPosts === false) {
+  assert.equal(posts.length,0,'隐藏文章时公开数据必须为空');
+  assert(!fs.existsSync(path.join(dist,'posts')),'隐藏文章时不得生成独立文章页面');
+  assert(!fs.readFileSync(path.join(dist,'sitemap.xml'),'utf8').includes('/posts/'),'站点地图不得包含隐藏文章');
+  for (const [file,doc] of docs) assert.equal(doc.querySelectorAll('.blog-row,.archive-row,.article-header').length,0,'页面不得显示隐藏文章: '+file);
+}
 const rss = fs.readFileSync(path.join(dist,'rss.xml'),'utf8');
 assert.equal((rss.match(/<item>/g)||[]).length,posts.length);
 for (const post of posts) assert(rss.includes(encodeURI(config.url+post.url)),'RSS 包含全部文章');
