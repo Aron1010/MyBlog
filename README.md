@@ -1,87 +1,154 @@
-# Aron 的清风日常
+# 清风日常 · Aron's Little Days
 
-正式域名：**https://aron.xin**。以八奈见杏菜主题插画、海风背景和轻透卡片为视觉风格的个人博客，记录学习、实践与生活。
+认真生活，也慢慢记录。
 
-此目录目前只在本地整理，未上传或部署。旧站 `../Firefly` 保持原样。
+Aron 的个人博客，记录后端开发、AI 编程与日常生活。以八奈见杏菜、蓝天与海风为主题，搭配浅蓝透明卡片，收藏学习过程中的收获和喜欢的画面。
 
-## 内容
+[访问博客](https://aron.xin) · [订阅 RSS](https://aron.xin/rss.xml) · [GitHub 仓库](https://github.com/Aron1010/MyBlog)
 
-已从旧站源码完整迁移 **32 篇已发布文章**：Linux 6 篇、MySQL 4 篇、Redis 22 篇。保留原始标题、正文、发布日期、更新日期、分类和标签；两篇生活设计示例已从网站中移除。
+## 内容与功能
 
-迁移已经完成，正式文章以 `content/posts/` 中的 Markdown 为内容源。`migration/` 仅保存历史备份和迁移报告，不参与构建或检查，可以删除。迁移时将「多级缓存学习索引」中不存在的 Lua 文章链接改为了文字说明。
+目前收录 **32 篇文章**，包括 Linux 6 篇、MySQL 4 篇、Redis 22 篇；杏菜集共有 **105 张图片**，由原有 9 张主题插画与新增 96 张收藏图片组成。
 
-站点不再读取旧项目，文章 Markdown 是独立内容源。
+- **阅读与检索**：文章列表、分类专题、日期归档、标签筛选和全文搜索。
+- **文章阅读**：目录导航、阅读进度、代码高亮与复制、Mermaid 流程图，以及保存在本机的喜欢记录。
+- **杏菜集**：首页晾衣绳照片墙、独立图库、缩略图延迟加载、点击查看大图和左右切换，图片下方不显示说明文字。
+- **音乐播放器**：本地歌曲、播放列表、同步歌词、音量调节，以及顺序播放、单曲循环和随机播放；站内切换页面时保持播放，不自动播放。
+- **手机布局**：独立竖屏背景、紧凑个人介绍卡片、右上角悬浮导航菜单和小型音乐面板；照片墙支持横向滑动，末尾可进入杏菜集。
 
-## 本地使用
+网站使用 HTML、CSS 和原生 JavaScript，构建脚本将 Markdown 文章预渲染为独立静态页面。正文与归档在关闭 JavaScript 时仍可阅读，搜索、音乐及图库交互需要启用 JavaScript。
 
-首次安装构建依赖：
+## 本地运行
+
+准备 Node.js 22 和 npm。通过本地预览命令启动服务或生成离线预览时，还需要 Python 3。
+
+在项目目录中依次运行：
 
 ```sh
 npm ci
+npm run build
+npm run check
+npm run preview
 ```
 
-生成并检查正式静态网站：
+浏览器打开 <http://127.0.0.1:4174/>，按 `Ctrl+C` 停止服务。修改文章、配置、图片或页面代码后，重新构建并刷新浏览器。
+
+| 命令 | 用途 |
+| --- | --- |
+| `npm ci` | 按锁定版本安装构建依赖 |
+| `npm run build` | 编译文章、预渲染页面并生成 `dist/` |
+| `npm run check` | 检查正文、页面元数据、站内链接、资源与 RSS |
+| `npm run preview` | 在本机预览 `dist/` 中的网站 |
+
+## 写作
+
+在 `content/posts/分类名/` 中创建 Markdown 文件，可复制 [文章模板](content/文章模板.md.txt)，然后修改顶部的 frontmatter：
+
+```yaml
+---
+title: 一篇新的学习笔记
+description: 记录遇到的问题、解决过程和自己的理解。
+published: 2026-10-19
+updated: 2026-10-19
+category: Linux
+tags: [Linux, 学习笔记]
+id: my-new-note
+permalink: /posts/linux/my-new-note/
+image: anna-bookshop
+author: Aron
+draft: false
+---
+```
+
+`id` 和 `permalink` 必须唯一；地址以 `/posts/` 开头、以 `/` 结尾，发布后尽量保持稳定。`published` 记录首次发布日期，修订时更新 `updated`。
+
+尚未完成的文章可以设为 `draft: true`，或放在 `content/drafts/` 中。草稿和设置了 `password` 字段的文章会被排除，不生成公开页面。
+
+文章之间使用相对 Markdown 链接，例如 `[另一篇笔记](./另一篇笔记.md)`。构建时会转换为站内地址，引用不存在的文章会报错。
+
+## 图片与音乐维护
+
+### 杏菜集
+
+原有 9 张主题插画配置在 `app.js` 的 `photos` 数组中，新增收藏图片配置在 [assets/gallery/photos.js](assets/gallery/photos.js)。每条记录包含图片名称、分类、缩略图、大图及来源链接。
+
+新增图片时，将缩略图放入 `assets/gallery/thumbnails/`，大图放入 `assets/gallery/full/`，并在 `GALLERY_PHOTOS` 数组中添加记录：
+
+```js
+{
+  id: 'anna-new-photo',
+  title: '八奈见杏菜 · 日常',
+  category: '插画',
+  thumb: 'assets/gallery/thumbnails/anna-new-photo.webp',
+  full: 'assets/gallery/full/anna-new-photo.webp',
+  width: 1600,
+  height: 2400,
+  source: '图片来源链接'
+}
+```
+
+图片名称用于无障碍描述，不会显示在照片下方。图库列表加载缩略图，打开预览后加载大图；图片总数会自动更新。首页展示的四张照片由 `app.js` 中的 `featuredGallery()` 选择。
+
+当前新增的 96 张图片分为插画 27 张、动画截图 50 张、合照 10 张、Q 版 9 张。整理后的原始文件与来源表保存在项目外的 `../ya/`；站内使用 WebP 副本，构建和部署不依赖该外部目录。
+
+### 音乐
+
+歌曲、封面、歌词和曲目数据位于 `assets/music/`，播放器逻辑位于 `music.js`。使用现有本地音乐库重新整理资源时，运行：
 
 ```sh
+python3 prepare_music.py
 npm run build
 npm run check
 ```
 
-本机预览：
+整理脚本读取项目上级的 `music/` 文件夹，使用 macOS 的 `afinfo` 获取歌曲时长。普通构建与网页播放只使用站内资源，不需要运行这个脚本；新增歌曲时需同步调整脚本中的曲目清单。
 
-```sh
-npm run preview
+## 构建与部署
+
+[GitHub Pages 工作流](.github/workflows/pages.yml) 在推送到 `main` 分支时自动运行，也可以从仓库的 Actions 页面手动触发：
+
+```text
+安装依赖 → 构建静态网站 → 完整性检查 → 部署 dist/
 ```
 
-打开 `http://127.0.0.1:4174/`。停止预览按 Ctrl+C。可部署的公开文件全部位于 **dist/**；应只发布该目录，不能发布整个项目目录，避免把草稿和原始备份一并公开。无需将全部地址回退到首页，每个文章地址都有真实的 HTML 页面；托管平台可使用 `404.html` 作为 404 页面。
+仓库的 Pages 发布来源使用 **GitHub Actions**。站点地址与联系信息配置在 [site.config.json](site.config.json)，当前正式域名为 `https://aron.xin`；自定义域名和 DNS 在 GitHub Pages 设置及域名服务商处管理。
 
-独立离线预览：
+`dist/` 是部署产物，包含各页面的 HTML、公开资源、RSS、站点地图、robots.txt 和 404 页面。部署时只发布该目录，无需将所有路径回退到首页。`dist/` 与 `node_modules/` 已加入 Git 忽略规则，可以通过构建和安装命令重新生成。
+
+## 离线预览
+
+需要一个可以直接双击打开的本地预览文件时，运行：
 
 ```sh
+npm run build
 python3 build_preview.py
 ```
 
-打开「清风日常.html」。样式、文章、插画和图表脚本已内嵌。音乐仍从相邻 `assets/music/` 读取；移动预览文件时一并保留该目录。旧文件名「晴天手帐.html」保留相同版本，兼容早期本地链接。
+生成的 `清风日常.html` 内嵌样式、文章、图片和图表脚本，文件较大，适合本地查看。音乐文件仍从相邻的 `assets/music/` 读取，移动预览文件时需一并保留该目录。离线预览不用于 GitHub Pages 部署。
 
-## 写作与维护
-
-- **写文章**：在 `content/posts/分类名/` 新建 `.md`，参考已有文章或 `content/文章模板.md.txt`。
-- **标题、简介、日期、分类、标签**：编辑文章顶部 frontmatter。`published` 是首次发布日期；后续修订时只更新 `updated`。
-- **地址**：`id` 和 `permalink` 必须唯一，发布后保持稳定。已迁移文章沿用旧站 `/posts/分类/文件名/` 地址，避免收藏与旧链接失效。
-- **草稿**：`draft: true` 或设置密码的内容不会公开。`content/drafts/` 始终不参与构建；准备发布时移入 `content/posts/` 并检查 frontmatter。
-- **内部文章链接**：使用相对 Markdown 路径，例如 `./另一篇文章.md`，构建时自动改为正式地址；不存在的站内文章链接会让构建失败，避免产生死链。
-- **流程图**：支持 Mermaid flowchart 与 sequenceDiagram，页面使用本地图表脚本，附带可展开的源码。没有外部 CDN 依赖。
-- **配置**：站名、作者、正式域名、简介、联系信息位于 `site.config.json`。
-- **音乐**：放入上级 `music/` 后运行 `python3 prepare_music.py` 更新资源，再构建。音乐与歌词在站内路由切换时保持播放，不自动播放。
-- **发布前**：运行构建、检查，再更新离线预览。单独运行 `build_preview.py` 不重新编译 Markdown。`npm run check` 根据当前正式文章检查正文、静态页面、站内链接、资源及 RSS。
-
-首次迁移脚本和迁移专用校验命令已移除。日常写作使用 `npm run build` 和 `npm run check`，不需要旧站源码或迁移备份。
-
-## 网站功能
-
-首页、文章列表、分类专题、归档、标签筛选、全文搜索、左侧文章目录、代码高亮和复制、阅读进度、本地喜欢收藏、杏菜集与音乐播放器。桌面侧栏在左侧；手机端目录折叠、导航分行。
-
-构建生成独立 HTML、canonical、Open Graph、BlogPosting 结构化数据、RSS、robots.txt 与 sitemap。关闭 JavaScript 时仍可阅读正文和归档；搜索、音乐、交互筛选与图表渲染需要 JavaScript。
-
-## 目录
+## 项目结构
 
 | 路径 | 用途 |
 | --- | --- |
-| `content/posts/` | 正式文章，主要维护入口 |
-| `content/drafts/` | 未公开草稿，不进入构建 |
-| `migration/`（可删除） | 历史备份、校验清单和迁移报告，不参与构建或检查 |
-| `scripts/` | 文章处理、静态生成、完整性检查 |
-| `dist/` | 构建生成的公开网站 |
-| `index.html`、`app.js`、`style.css` | 页面壳、交互与样式 |
-| `assets/` | 插画、音乐与本地运行脚本 |
-| `output/` | 历次设计稿、生成提示词和验证截图，不公开 |
+| `content/posts/` | 正式文章的 Markdown 内容源 |
+| `content/drafts/` | 可选的草稿目录，不参与公开构建 |
+| `content/文章模板.md.txt` | 新文章模板 |
+| `index.html` | 页面结构、导航和弹窗 |
+| `app.js` | 路由、文章展示、搜索和图库交互 |
+| `style.css` | 桌面与手机端样式 |
+| `music.js` | 音乐播放器交互 |
+| `site.config.json` | 站名、域名、作者及联系信息 |
+| `assets/` | 背景、头像、插画和本地脚本 |
+| `assets/gallery/` | 收藏图片清单、缩略图及大图 |
+| `assets/music/` | 歌曲、封面和曲目数据 |
+| `assets/posts.js` | 构建生成的文章数据，请从 Markdown 修改文章 |
+| `scripts/` | 内容编译、静态生成与检查脚本 |
+| `.github/workflows/pages.yml` | GitHub Pages 自动构建与部署 |
+| `dist/` | 可重新生成的公开网站 |
+| `清风日常.html` | 可重新生成的离线预览 |
 
-## 资源说明
+## 资源与依赖
 
-9 幅杏菜主题画面为 AI 辅助绘制，提示词与原始图位于 `output/gallery/`；海风背景原图位于 `output/seaside-breeze-background.png`。头像、歌曲及封面沿用个人项目资源。
+原有主题插画由 AI 辅助绘制，新增收藏包含插画、动画截图、合照和 Q 版素材，来源链接记录在图片清单中，图片保留原有署名与标记。头像、歌曲和封面沿用个人项目资源。
 
-Markdown 使用 [Marked](https://github.com/markedjs/marked)，代码高亮使用 [highlight.js](https://highlightjs.org/)，图表使用 [Mermaid Tiny](https://mermaid.js.org/config/usage.html)。构建依赖版本固定于 `package-lock.json`。
-
-## 杏菜集图片维护
-
-杏菜集保留原有 9 张主题插画，新增从本地 `../ya/` 整理的 96 张收藏图片，共 105 张。新增图片数据及来源链接保存在 `assets/gallery/photos.js`，列表使用 `assets/gallery/thumbnails/` 中的 WebP 缩略图，点击后加载 `assets/gallery/full/` 大图。原始文件仍保存在 `../ya/`，构建和部署只读取站内副本。图片下方不显示文字，移动端和桌面端都支持大图切换。
+Markdown 解析使用 Marked，代码高亮使用 highlight.js，图表使用 Mermaid Tiny；构建还使用 linkedom 和 YAML。运行时脚本随站点资源提供，npm 依赖版本由 `package-lock.json` 锁定。
