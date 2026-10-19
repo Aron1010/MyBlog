@@ -5,5 +5,6 @@
   "description": "Aron 的个人博客，记录后端开发、AI 编程与日常生活。分享 Linux、MySQL、Redis 的学习笔记与实践。",
   "email": "aronblake1010@gmail.com",
   "github": "https://github.com/aron1010",
-  "language": "zh-CN"
+  "language": "zh-CN",
+  "showPosts": false
 }

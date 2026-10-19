@@ -49,8 +49,8 @@ for (const route of [...routes,'/404/']) {
 }
 const xml = value=>String(value).replace(/[<>&"']/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&apos;'}[c]));
 const absolute = route=>config.url+encodeURI(decodeURI(route));
-const latest = posts.reduce((max,p)=>p.updated>max?p.updated:max,posts[0].date);
-const sitemap = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'+routes.map(route=>'<url><loc>'+xml(absolute(route))+'</loc><lastmod>'+(posts.find(p=>p.url===route)?.updated||latest)+'</lastmod></url>').join('')+'</urlset>\n';
+const latest = posts.reduce((max,p)=>p.updated>max?p.updated:max,'');
+const sitemap = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'+routes.map(route=>'<url><loc>'+xml(absolute(route))+'</loc>'+(latest?'<lastmod>'+(posts.find(p=>p.url===route)?.updated||latest)+'</lastmod>':'')+'</url>').join('')+'</urlset>\n';
 fs.writeFileSync(path.join(output,'sitemap.xml'),sitemap);
 fs.writeFileSync(path.join(output,'sitemap-0.xml'),sitemap);
 fs.writeFileSync(path.join(output,'sitemap-index.xml'),'<?xml version="1.0" encoding="UTF-8"?><sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><sitemap><loc>'+xml(config.url+'/sitemap.xml')+'</loc></sitemap></sitemapindex>\n');
