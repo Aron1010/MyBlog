@@ -13,7 +13,8 @@ const photos = [
   {image:'evening',title:'把温柔留给傍晚',label:'after the rain'},
   {image:'seaside-breeze',title:'海风吹来的晴天',label:'a breeze from the sea'},
   {image:'anna-bookshop',title:'把午后留给一本书',label:'a quiet afternoon'},
-  {image:'anna-hydrangea',title:'雨天也有蓝色心情',label:'a little blue in the rain'}
+  {image:'anna-hydrangea',title:'雨天也有蓝色心情',label:'a little blue in the rain'},
+  ...GALLERY_PHOTOS
 ];
 const main = document.querySelector('#main');
 const esc = value => String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -102,7 +103,7 @@ function filters() {
   return `<div class="filter-row" role="group" aria-label="文章分类">${categories.map(c => `<button data-filter="${esc(c)}" class="${selected === c ? 'active' : ''}" aria-pressed="${selected === c}">${esc(c)}</button>`).join('')}</div>`;
 }
 function profileCard() {
-  return `<section class="profile-card"><img class="profile-avatar" src="${imageSrc('aron')}" alt="Aron 的头像"><h2>Hello, I'm Aron.</h2><p>持续学习，也认真生活。<br>记录后端开发、AI 编程，<br>以及折腾个人网站的点滴。</p><div class="profile-stats"><a href="#archive"><strong>${realPosts.length}</strong><span>篇文章</span></a><a href="#diary"><strong>${new Set(realPosts.map(e => e.category)).size}</strong><span>个分类</span></a><a href="#gallery"><strong>${photos.length}</strong><span>张插画</span></a></div><div class="profile-social"><a href="${esc(SITE_CONFIG.github)}" target="_blank" rel="noopener">GitHub ↗</a><a href="mailto:${esc(SITE_CONFIG.email)}">Email ↗</a></div></section>`;
+  return `<section class="profile-card"><img class="profile-avatar" src="${imageSrc('aron')}" alt="Aron 的头像"><h2>Hello, I'm Aron.</h2><p>持续学习，也认真生活。<br>记录后端开发、AI 编程，<br>以及折腾个人网站的点滴。</p><div class="profile-stats"><a href="#archive"><strong>${realPosts.length}</strong><span>篇文章</span></a><a href="#diary"><strong>${new Set(realPosts.map(e => e.category)).size}</strong><span>个分类</span></a><a href="#gallery"><strong>${photos.length}</strong><span>张图片</span></a></div><div class="profile-social"><a href="${esc(SITE_CONFIG.github)}" target="_blank" rel="noopener">GitHub ↗</a><a href="mailto:${esc(SITE_CONFIG.email)}">Email ↗</a></div></section>`;
 }
 function sidebar() {
   const counts = new Map();
@@ -115,16 +116,20 @@ function diary() {
   const list = filteredPosts();
   return `<section id="diary-section" class="diary-section"><div class="diary-heading"><div class="section-top"><div><div class="kicker">NOTES, DAYS & LITTLE DISCOVERIES</div><h2 class="section-title">${activeTag ? '# ' + esc(activeTag) : selected === '全部' ? '最近更新' : esc(selected)} <span class="post-count">${list.length} 篇</span></h2></div><p class="latest-note">LATEST NOTE / <time datetime="${realPosts[0].date}">${date(realPosts[0].date)}</time></p></div>${filters()}${activeTag ? '<button id="clear-tag" class="clear-filter">清除标签筛选 ×</button>' : ''}</div><div class="diary-layout"><div class="blog-list">${list.length ? list.slice(0, limit).map(card).join('') : '<p class="empty">这个标签下暂时还没有文章。<a href="#diary">查看全部文章 ↗</a></p>'}${list.length > limit ? '<button class="more-button" id="load-more">再翻几页 ↓</button>' : '<p class="list-end">— 读到这里，歇一小会儿 ☁ —</p>'}</div>${sidebar()}</div></section>`;
 }
+function photoSrc(photo, full = false) {
+  const asset = full ? photo.full : photo.thumb;
+  return asset ? IMAGE_DATA[asset] || (pathRouting ? '/' : '') + asset : imageSrc(photo.image);
+}
 function galleryCard(p, i) {
-  return `<button type="button" class="gallery-card" data-photo="${i}" aria-label="查看大图：${esc(p.title)}"><figure><div class="gallery-art"><img src="${imageSrc(p.image)}" alt="${esc(p.title)} · 八奈见杏菜主题插画" loading="lazy"><span class="gallery-expand" aria-hidden="true">↗</span></div></figure></button>`;
+  return `<button type="button" class="gallery-card" data-photo="${i}" aria-label="查看大图：${esc(p.title)}"><figure><div class="gallery-art"><img src="${photoSrc(p)}" alt="${esc(p.title)}" loading="lazy" decoding="async"><span class="gallery-expand" aria-hidden="true">↗</span></div></figure></button>`;
 }
 let activePhoto = 0;
 function showPhoto(index, open = false) {
   activePhoto = (index + photos.length) % photos.length;
   const photo = photos[activePhoto];
   const image = document.querySelector('#large-image');
-  image.src = imageSrc(photo.image);
-  image.alt = photo.title + ' · 八奈见杏菜主题插画';
+  image.src = photoSrc(photo, true);
+  image.alt = photo.title;
   if (open) document.querySelector('#image-dialog').showModal();
 }
 function featuredGallery() {
@@ -144,7 +149,7 @@ function archive() {
   return `<div class="content"><div class="view-intro"><div class="kicker">THE ARCHIVE</div><h1>写过的，都在这里。</h1><p>${realPosts.length} 篇文章 · 按发布日期排列</p></div><div class="archive-layout"><section class="archive-list">${realPosts.map(e => { const current = e.date.slice(0, 7); const heading = current !== month ? `<h2 class="archive-month">${current.replace('-', ' / ')} <small>${realPosts.filter(p => p.date.startsWith(current)).length} 篇</small></h2>` : ''; month = current; return heading + `<a class="archive-row" href="#post/${e.id}"><time datetime="${e.date}">${e.date.slice(5).replace('-', '.')}</time><span>${esc(e.title)}</span><small>${esc(e.category)} ↗</small></a>`; }).join('')}</section>${sidebar()}</div></div>`;
 }
 function gallery() {
-  return `<div class="content collection-page"><div class="view-intro"><div class="kicker">ANNA YANAMI / LITTLE DAYS IN BLUE</div><h1>杏菜集</h1><p>蓝天、微风，和那些闪闪发亮的日常。${photos.length} 张主题插画，慢慢看。</p></div><div class="gallery-grid gallery-collection">${photos.map(galleryCard).join('')}</div><p class="collection-credit">以八奈见杏菜为主题，由 AI 辅助绘制的日常插画收藏，记录喜欢的画面。</p></div>`;
+  return `<div class="content collection-page"><div class="view-intro"><div class="kicker">ANNA YANAMI / LITTLE DAYS IN BLUE</div><h1>杏菜集</h1><p>蓝天、微风，和那些闪闪发亮的日常。${photos.length} 张图片，慢慢看。</p></div><div class="gallery-grid gallery-collection">${photos.map(galleryCard).join('')}</div><p class="collection-credit">收藏八奈见杏菜的日常：主题插画、动画画面与 Q 版小表情。部分主题插画由 AI 辅助绘制。</p></div>`;
 }
 function about() {
   return `<div class="content"><div class="about-page"><div class="view-intro"><div class="kicker">THE PERSON BEHIND THE NOTES</div><h1>你好，我是 Aron。</h1><p>持续学习，持续实践，也认真生活。</p></div><img src="${imageSrc('rooftop')}" alt="杏菜与晴空"><div class="prose"><h2>关于我</h2><p>你好，我是 <strong>Aron</strong>，一名正在持续学习和实践的技术爱好者。</p><p>我对后端开发和 AI 编程等方向感兴趣，也喜欢把学习过程中遇到的问题、验证过的解决方法以及自己的思考整理成文字。相比单纯收藏资料，我更愿意通过写作重新梳理知识，让零散的经验逐渐形成清晰、可复用的体系。</p><p>技术之外，我也享受折腾个人网站、优化使用体验，以及探索各种有趣的工具。这个博客既是我的学习笔记，也是我在互联网中保留的一小块个人空间。</p><h2>为什么写博客</h2><p>写下来的过程，也是重新思考的过程。我希望这个博客能够帮助自己沉淀知识、记录成长，也希望这些内容能为遇到相似问题的人提供一点参考。</p><h2>关于清风日常</h2><p>清风日常是我的个人博客，记录后端开发、AI 编程与日常生活。这里的文章不追求堆砌概念，而是希望说明问题的背景、背后的原理和实际操作方法，也会随着新的理解和实践持续补充。蓝天、微风与八奈见杏菜主题插画，陪这些文字一起留在这里。</p><h2>找到我</h2><p><a href="${esc(SITE_CONFIG.github)}" target="_blank" rel="noopener">GitHub ↗</a> &nbsp; / &nbsp; <a href="mailto:${esc(SITE_CONFIG.email)}">Email ↗</a></p></div></div></div>`;
