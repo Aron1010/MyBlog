@@ -20,11 +20,12 @@ function isoDate(value, fallback='') {
   return date;
 }
 export function compile() {
+  if (config.publishedPostIds !== undefined && !Array.isArray(config.publishedPostIds)) throw new Error('publishedPostIds 必须是文章 id 数组');
   const ids = new Set(), urls = new Set();
   const posts = [];
   for (const file of walk(path.join(root,'content','posts')).filter(f => /\.mdx?$/.test(f))) {
     const {data,markdown} = readPost(file);
-    if (config.showPosts === false || data.draft === true || data.password) continue;
+    if (config.showPosts === false || data.draft === true || data.password || (config.publishedPostIds && !config.publishedPostIds.includes(data.id))) continue;
     const relative = path.relative(path.join(root,'content','posts'),file).split(path.sep).join('/');
     const id = data.id;
     const permalink = data.permalink;
