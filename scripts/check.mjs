@@ -9,7 +9,7 @@ const context = {};
 vm.runInNewContext(fs.readFileSync(path.join(root,'assets/posts.js'),'utf8')+';this.posts=BLOG_POSTS;',context);
 const posts = context.posts;
 const sourcePosts = walk(path.join(root,'content','posts')).filter(file=>/\.mdx?$/.test(file)).map(file=>({file,...readPost(file)}));
-const publishedSources = sourcePosts.filter(({data})=>config.showPosts!==false && data.draft!==true && !data.password);
+const publishedSources = sourcePosts.filter(({data})=>config.showPosts!==false && data.draft!==true && !data.password && (!config.publishedPostIds || config.publishedPostIds.includes(data.id)));
 assert.equal(posts.length,publishedSources.length,'公开文章数量应与当前内容源一致');
 for (const {file,data,markdown} of publishedSources) {
   const post = posts.find(post=>post.source===path.relative(path.join(root,'content','posts'),file).split(path.sep).join('/'));

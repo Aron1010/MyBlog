@@ -138,7 +138,7 @@ function featuredGallery() {
   return `<section id="home-gallery" class="gallery-section home-gallery" aria-label="晴天照片墙"><div class="gallery-grid gallery-preview photo-clothesline" role="region" aria-label="晾晒晴天照片，可横向滚动" tabindex="0"><svg class="photo-rope" viewBox="0 0 1200 44" preserveAspectRatio="none" aria-hidden="true"><path d="M0 10 Q600 40 1200 10"/></svg>${featured.map(i => galleryCard(photos[i], i)).join('')}<a class="gallery-visit-link" href="#gallery">前往杏菜集 <span aria-hidden="true">↗</span></a></div></section>`;
 }
 function topics() {
-  const descriptions = {Linux:'从目录与路径到网络排查，记下日常使用的基础与方法。', MySQL:'梳理数据库基础、SQL 查询、多表关联、权限与事务。', Redis:'从数据结构到分布式锁、多级缓存和集群，记录缓存的原理与实践。'};
+  const descriptions = {'计算机科学导论':'从通用计算与存储程序出发，理解数据、算法和硬件的关系，再掌握进制、位权与数字表示。按章节逐步建立计算机科学的基础。', Linux:'从目录与路径到网络排查，记下日常使用的基础与方法。', MySQL:'梳理数据库基础、SQL 查询、多表关联、权限与事务。', Redis:'从数据结构到分布式锁、多级缓存和集群，记录缓存的原理与实践。'};
   const topicEntries = categories.filter(c=>c !== '全部').map(name=>[name,descriptions[name] || '记录' + name + '中的见闻、思考与实践。']);
   return `<div class="content topics-page"><div class="view-intro"><div class="kicker">EXPLORE BY TOPIC</div><h1>沿着兴趣，慢慢读。</h1><p>${topicEntries.length} 个专题 · ${realPosts.length} 篇学习笔记</p></div><div class="topic-grid">${topicEntries.map(([name, description]) => { const posts = realPosts.filter(e => e.category === name); return `<section class="topic-card"><div class="topic-heading"><h2><a href="#category/${name}">${name}</a></h2><span>${posts.length} 篇文章</span></div><p>${description}</p><ul>${posts.slice(0,4).map(e => `<li><a href="#post/${e.id}">${esc(e.title)} <span aria-hidden="true">↗</span></a></li>`).join('')}</ul><a class="topic-more" href="#category/${name}">查看全部 ${posts.length} 篇 <span aria-hidden="true">→</span></a></section>`; }).join('')}</div></div>`;
 }
@@ -278,12 +278,13 @@ function render(scroll = true) {
   selected = route.startsWith('category/') ? value : route === 'home' ? params.get('category') || '全部' : '全部';
   activeTag = route.startsWith('tag/') ? value : '';
   const view = route.startsWith('post/') ? 'post' : route.startsWith('category/') || route.startsWith('tag/') ? 'diary' : route;
+  const drawerSubnav = document.querySelector('.drawer-subnav');
+  if (drawerSubnav) drawerSubnav.innerHTML = '<a href="#diary" data-nav="diary">全部文章</a>' + categories.filter(c=>c !== '全部').map(c=>`<a href="#category/${encodeURIComponent(c)}">${esc(c)}</a>`).join('');
   document.querySelectorAll('[data-nav]').forEach(a => {
     const active = a.dataset.nav === view || view === 'post' && a.dataset.nav === 'diary';
     a.classList.toggle('active', active);
     if (active) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
   });
-  if (!realPosts.length) document.querySelectorAll('.drawer-subnav a[href^="#category/"],.drawer-subnav a[href^="/categories/"]').forEach(link => link.remove());
   document.body.classList.toggle('is-reading', view === 'post');
   document.body.classList.toggle('is-home', view === 'home');
   main.innerHTML = view === 'post' ? article(value) : view === 'gallery' ? gallery() : view === 'topics' ? topics() : view === 'archive' ? archive() : view === 'about' ? about() : view === '404' ? `<div class="content empty"><h1>这页记录暂时没有找到。</h1><p>可以搜索文章，或<a href="#home">回到首页 ↗</a>。</p></div>` : view === 'diary' ? `<div class="content"><div class="view-intro"><div class="kicker">ALL MY NOTES</div><h1>一点一滴，写下来。</h1><p>学习笔记、生活片段，还有那些值得留下的思考。</p></div>${diary()}</div>` : home();

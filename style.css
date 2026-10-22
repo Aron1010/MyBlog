@@ -871,6 +871,12 @@ footer .footer-bottom{margin-top:0}
 .home-gallery .photo-clothesline .gallery-card:after{content:'';position:absolute;top:-11px;left:calc(50% - 3px);z-index:3;width:6px;height:3px;border-top:1px solid #7897ae;border-bottom:1px solid rgba(255,255,255,.9);border-radius:1px}
 .home-gallery .photo-clothesline .gallery-art{border-radius:4px;box-shadow:none}
 .home-gallery .photo-clothesline figcaption{display:none}
+
+/* Chapter illustrations remain legible and stay within the reading column. */
+.article-prose .note-figure{margin:26px 0}
+.article-prose .note-figure img{display:block;width:100%;height:auto;border:1px solid #d6e6f1;border-radius:12px}
+.article-prose .note-figure figcaption{margin-top:10px;font-size:12px;line-height:1.8;color:#58778d}
+.article-prose .note-cover{margin-top:0}
 .home-gallery .photo-clothesline .gallery-card-title{font-size:12px}
 .home-gallery .photo-clothesline .gallery-card-meta{font-size:10px;margin-top:5px}
 @media(hover:hover){
