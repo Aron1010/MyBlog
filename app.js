@@ -80,6 +80,21 @@ function navigate(hash, preserveScroll = false, focusFilter = '') {
 function tocLinks(id) {
   return articleHeadings.map(h => `<a class="toc-link ${h.level === 'H3' ? 'toc-sub' : ''}" data-scroll="${h.id}" href="#post/${id}?section=${h.id}">${esc(h.title)}</a>`).join('');
 }
+let tocHidden = false;
+try { tocHidden = localStorage.getItem('aron-sunny-toc-hidden') === 'true'; } catch {}
+function toggleArticleToc() {
+  const layout = main.querySelector('.reading-layout');
+  const aside = main.querySelector('#article-toc');
+  const button = main.querySelector('[data-toggle-toc]');
+  if (!layout || !aside || !button) return;
+  tocHidden = !tocHidden;
+  layout.classList.toggle('toc-hidden', tocHidden);
+  aside.hidden = tocHidden;
+  button.setAttribute('aria-expanded', String(!tocHidden));
+  button.textContent = tocHidden ? '显示目录' : '隐藏目录';
+  try { localStorage.setItem('aron-sunny-toc-hidden', String(tocHidden)); } catch {}
+  updateProgress();
+}
 function jumpToSection(id, animate = true) {
   const heading = document.getElementById(id) || main.querySelector('[data-section="' + CSS.escape(id) + '"]');
   if (!heading || !articleHeadings.some(h => h.id === heading.id)) return;
@@ -206,7 +221,7 @@ function article(id) {
   const content = markdownContent(e);
   const siblings = entries.filter(p => p.category === e.category && p.id !== e.id);
   const next = siblings[0] || realPosts.find(p => p.id !== e.id);
-  return `<div class="content"><div class="article-breadcrumb"><a href="#home">首页</a><span>/</span><a href="#category/${encodeURIComponent(e.category)}">${esc(e.category)}</a><span>/</span><span>正文</span></div><div class="reading-layout"><article class="article-wrap"><header class="article-header"><div class="post-meta"><a class="category-label" href="#category/${encodeURIComponent(e.category)}">${esc(e.category)}</a><span class="dot"></span><time datetime="${e.date}">${date(e.date)}</time><span class="dot"></span>${e.minutes} 分钟阅读</div><h1>${esc(e.title)}</h1><p class="article-description">${esc(e.desc)}</p><div class="article-byline"><img src="${imageSrc('aron')}" alt=""><span>Aron <small>学习笔记</small></span><div class="byline-tags">${e.tags.slice(0, 4).map(tagLink).join('')}</div></div></header>${articleHeadings.length ? `<details class="mobile-toc"><summary>文章目录 <span>${articleHeadings.length} 个章节</span></summary><nav aria-label="手机文章目录">${tocLinks(e.id)}</nav></details>` : ''}<div class="prose article-prose" id="article-body">${content}</div><div class="article-attribution"><strong>Aron 的清风日常</strong><p>作者 ${esc(e.author)} · 发布于 ${date(e.date)}${e.updated !== e.date ? ' · 更新于 ' + date(e.updated) : ''}</p><p>愿这份记录能为你提供一点参考。发现问题，欢迎通过 <a href="${esc(SITE_CONFIG.github)}" target="_blank" rel="noopener">GitHub</a> 或 <a href="mailto:${esc(SITE_CONFIG.email)}">邮件</a>交流。</p></div><div class="article-end"><p>如果这篇记录对你有用，留下一份喜欢。</p>${heart(e.id)}</div><div class="article-next"><a href="#diary">← 所有文章</a><a href="#post/${next.id}"><small>继续阅读</small>${esc(next.title)} →</a></div></article><aside class="article-aside"><div class="toc"><div class="toc-title">这一页的目录 <span>☁</span></div><nav aria-label="文章目录">${tocLinks(e.id)}</nav><a class="toc-back" href="#diary">← 回到文章列表</a></div></aside></div><button class="back-top" id="back-top" aria-label="回到顶部">↑</button></div>`;
+  return `<div class="content"><div class="article-breadcrumb"><a href="#home">首页</a><span>/</span><a href="#category/${encodeURIComponent(e.category)}">${esc(e.category)}</a><span>/</span><span>正文</span>${articleHeadings.length ? `<button class="toc-toggle" type="button" data-toggle-toc aria-controls="article-toc" aria-expanded="${!tocHidden}">${tocHidden ? '显示目录' : '隐藏目录'}</button>` : ''}</div><div class="reading-layout${tocHidden || !articleHeadings.length ? ' toc-hidden' : ''}"><article class="article-wrap"><header class="article-header"><div class="post-meta"><a class="category-label" href="#category/${encodeURIComponent(e.category)}">${esc(e.category)}</a><span class="dot"></span><time datetime="${e.date}">${date(e.date)}</time><span class="dot"></span>${e.minutes} 分钟阅读</div><h1>${esc(e.title)}</h1><p class="article-description">${esc(e.desc)}</p><div class="article-byline"><img src="${imageSrc('aron')}" alt=""><span>Aron <small>学习笔记</small></span><div class="byline-tags">${e.tags.slice(0, 4).map(tagLink).join('')}</div></div></header>${articleHeadings.length ? `<details class="mobile-toc"><summary>文章目录 <span>${articleHeadings.length} 个章节</span></summary><nav aria-label="手机文章目录">${tocLinks(e.id)}</nav></details>` : ''}<div class="prose article-prose" id="article-body">${content}</div><div class="article-attribution"><strong>Aron 的清风日常</strong><p>作者 ${esc(e.author)} · 发布于 ${date(e.date)}${e.updated !== e.date ? ' · 更新于 ' + date(e.updated) : ''}</p><p>愿这份记录能为你提供一点参考。发现问题，欢迎通过 <a href="${esc(SITE_CONFIG.github)}" target="_blank" rel="noopener">GitHub</a> 或 <a href="mailto:${esc(SITE_CONFIG.email)}">邮件</a>交流。</p></div><div class="article-end"><p>如果这篇记录对你有用，留下一份喜欢。</p>${heart(e.id)}</div><div class="article-next"><a href="#diary">← 所有文章</a><a href="#post/${next.id}"><small>继续阅读</small>${esc(next.title)} →</a></div></article>${articleHeadings.length ? `<aside class="article-aside" id="article-toc"${tocHidden ? ' hidden' : ''}><div class="toc"><div class="toc-title">这一页的目录 <span>☁</span></div><nav aria-label="文章目录">${tocLinks(e.id)}</nav><a class="toc-back" href="#diary">← 回到文章列表</a></div></aside>` : ''}</div><button class="back-top" id="back-top" aria-label="回到顶部">↑</button></div>`;
 }
 function updateMetadata(view, id) {
   const post = view === 'post' ? entries.find(p => p.id === id) : null;
@@ -350,6 +365,7 @@ window.addEventListener('scroll', () => {
 }, {passive: true});
 window.addEventListener('resize', updateProgress);
 document.addEventListener('click', async event => {
+  if (event.target.closest('[data-toggle-toc]')) toggleArticleToc();
   const filter = event.target.closest('[data-filter]');
   if (filter) {
     const category = filter.dataset.filter;
