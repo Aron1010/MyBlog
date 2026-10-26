@@ -42,14 +42,9 @@ npm run preview
 
 ## 写作
 
-当前 `site.config.json` 中的 `showPosts` 为 `true`，`publishedPostIds` 包含《计算机科学导论》前两章，以及 Linux、MySQL 两套指南的全部文章。未列入名单的文章不会进入页面、搜索、RSS、站点地图或公开文章数据，原始 Markdown 保留。发布后续文章时，将新文章的 `id` 加入名单，再构建、检查并部署。设置 `showPosts: false` 可以隐藏全部文章；删除 `publishedPostIds` 字段会恢复公开所有符合条件的文章。草稿与密码排除规则始终有效。
+当前 `site.config.json` 中的 `showPosts` 为 `true`，`publishedPostIds` 包含 C Primer Plus（第6版）的 17 章正文和 2 篇附录，以及 Linux、MySQL 两套指南的全部文章。未列入名单的文章不会进入页面、搜索、RSS、站点地图或公开文章数据，原始 Markdown 保留。发布后续文章时，将新文章的 `id` 加入名单，再构建、检查并部署。设置 `showPosts: false` 可以隐藏全部文章；删除 `publishedPostIds` 字段会恢复公开所有符合条件的文章。草稿与密码排除规则始终有效。
 
-当前系列：
-
-- [第一章：认识计算机与计算机科学](https://aron.xin/posts/computer-science/01-introduction/)
-- [第二章：数字系统、位权与进制转换](https://aron.xin/posts/computer-science/02-number-systems/)
-
-两篇文章的封面保存在 `assets/cs-intro-01.jpg`、`assets/cs-intro-02.jpg`，正文示意图位于 `assets/diagrams/`。正文保留原笔记，另加系列导航、来源说明和自测题。
+[C Primer Plus（第6版）](https://aron.xin/categories/C%20Primer%20Plus/)系列包含 17 章正文和 2 篇附录，源文件位于 `content/posts/C Primer Plus/`，保留导入 Markdown 的完整正文，已加入公开文章名单。原《计算机科学导论》两篇文章及其封面、正文示意图已删除。
 
 [Linux 入门指南](content/posts/Linux/00-Linux入门指南.md)由一篇导读和九章正文组成，覆盖目录与文件、文本处理、软件与服务、网络资源、用户权限、SSH、Shell 脚本与定时任务、磁盘挂载与备份恢复。各章包含示例、常见问题和速查，不设置自测与练习；已加入公开文章名单。
 

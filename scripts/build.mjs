@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import vm from 'node:vm';
+import {createHash} from 'node:crypto';
 import {createRequire} from 'node:module';
 import {parseHTML,DOMParser} from 'linkedom';
 import {root,config,compile} from './content.mjs';
@@ -16,7 +17,9 @@ fs.copyFileSync(path.join(root,'node_modules/@mermaid-js/tiny/dist/mermaid.tiny.
 for (const file of ['app.js','music.js','style.css']) fs.copyFileSync(path.join(root,file),path.join(output,file));
 fs.cpSync(path.join(root,'assets'),path.join(output,'assets'),{recursive:true});
 const original = fs.readFileSync(path.join(root,'index.html'),'utf8');
-const template = original.replace('data-routing="hash"','data-routing="path"').replaceAll('src="assets/','src="/assets/').replaceAll('href="assets/','href="/assets/').replace('href="style.css"','href="/style.css"').replace('src="music.js"','src="/music.js"').replace('src="app.js"','src="/app.js"');
+const assetVersion = file => createHash('sha256').update(fs.readFileSync(path.join(root,file))).digest('hex').slice(0,12);
+const template = original.replace('data-routing="hash"','data-routing="path"').replaceAll('src="assets/','src="/assets/').replaceAll('href="assets/','href="/assets/').replace('href="style.css"','href="/style.css"').replace('src="music.js"','src="/music.js"').replace('src="app.js"','src="/app.js"')
+  .replace(/(src|href)="\/(app\.js|music\.js|style\.css|assets\/[^"?]+\.js)"/g,(_,attribute,file)=>`${attribute}="/${file}?v=${assetVersion(file)}"`);
 const app = fs.readFileSync(path.join(root,'app.js'),'utf8');
 const sources = ['assets/posts.js','assets/music/tracks.js','assets/gallery/photos.js','music.js'].map(file=>[file,fs.readFileSync(path.join(root,file),'utf8')]);
 const categories = [...new Set(posts.map(p=>p.category))];

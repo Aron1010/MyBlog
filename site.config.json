@@ -8,8 +8,6 @@
   "language": "zh-CN",
   "showPosts": true,
   "publishedPostIds": [
-    "cs-intro-01",
-    "cs-intro-02",
     "linux-guide",
     "linux-paths",
     "post-2e2663493e",
@@ -28,6 +26,25 @@
     "mysql-index-explain",
     "mysql-views-cte-window",
     "mysql-app-connections",
-    "mysql-backup-maintenance"
+    "mysql-backup-maintenance",
+    "c-primer-plus-01",
+    "c-primer-plus-02",
+    "c-primer-plus-03",
+    "c-primer-plus-04",
+    "c-primer-plus-05",
+    "c-primer-plus-06",
+    "c-primer-plus-07",
+    "c-primer-plus-08",
+    "c-primer-plus-09",
+    "c-primer-plus-10",
+    "c-primer-plus-11",
+    "c-primer-plus-12",
+    "c-primer-plus-13",
+    "c-primer-plus-14",
+    "c-primer-plus-15",
+    "c-primer-plus-16",
+    "c-primer-plus-17",
+    "c-primer-plus-appendix-numbers",
+    "c-primer-plus-appendix-reference"
   ]
 }
