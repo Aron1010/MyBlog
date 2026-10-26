@@ -1,7 +1,6 @@
 ---
 title: Linux 入门（六）：用户、用户组与权限管理
-published: 2026-07-09
-updated: 2026-10-26
+published: 2026-05-20
 description: 从用户身份和文件访问规则出发，整理账号与用户组管理、rwx、chmod、chown、umask、SGID、粘滞位、ACL 与 sudo，并给出权限不足的排查顺序。
 tags:
   - Linux

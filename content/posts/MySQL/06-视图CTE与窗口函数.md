@@ -1,7 +1,6 @@
 ---
 title: MySQL 入门（六）：视图、CTE 与窗口函数
-published: 2026-10-26
-updated: 2026-10-26
+published: 2026-05-20
 description: 使用视图复用查询接口，用普通和递归 CTE 拆解复杂查询，理解窗口分区、排序、排名和累计计算，并区分窗口函数与分组聚合。
 tags: [MySQL, MySQL入门, 视图, CTE, 窗口函数]
 category: MySQL

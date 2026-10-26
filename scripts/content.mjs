@@ -33,7 +33,7 @@ export function compile() {
     if (ids.has(id) || urls.has(permalink)) throw new Error('文章 id 或地址重复: '+file);
     ids.add(id); urls.add(permalink);
     if (!data.title || !data.description || !data.category) throw new Error('请补齐标题、简介和分类: '+file);
-    posts.push({id,title:data.title,desc:data.description,date:isoDate(data.published),updated:isoDate(data.updated,data.published),category:data.category,tags:[...new Set((data.tags||[]).map(t=>String(t).trim()).filter(Boolean))],image:data.image||'anna-bookshop',minutes:Math.max(2,Math.ceil(markdown.length/650)),markdown,source:relative,url:permalink,author:data.author||config.author});
+    posts.push({id,title:data.title,desc:data.description,date:isoDate(data.published),category:data.category,tags:[...new Set((data.tags||[]).map(t=>String(t).trim()).filter(Boolean))],image:data.image||'anna-bookshop',minutes:Math.max(2,Math.ceil(markdown.length/650)),markdown,source:relative,url:permalink,author:data.author||config.author});
   }
   posts.sort((a,b)=>b.date.localeCompare(a.date)||a.source.localeCompare(b.source,'zh-CN',{numeric:true}));
   const bySource = new Map(posts.map(p=>[p.source,p]));

@@ -1,7 +1,6 @@
 ---
 title: MySQL 入门（七）：应用连接与 SQL 安全
-published: 2026-10-26
-updated: 2026-10-26
+published: 2026-05-22
 description: 从驱动和连接参数出发，讲解参数化查询、动态标识符、事务清理、连接池、超时、字符集、时区与 TLS，并提供最小 Python 查询示例。
 tags: [MySQL, MySQL入门, 参数化查询, 连接池, SQL安全]
 category: MySQL

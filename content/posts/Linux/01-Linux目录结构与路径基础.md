@@ -1,7 +1,6 @@
 ---
 title: Linux 入门（一）：目录结构、路径与命令帮助
-published: 2026-07-08
-updated: 2026-10-26
+published: 2026-02-04
 description: 从终端与目录树出发，理解根目录、HOME、工作目录和路径的关系，掌握路径书写、隐藏文件、命令结构与帮助查询。
 tags:
   - Linux

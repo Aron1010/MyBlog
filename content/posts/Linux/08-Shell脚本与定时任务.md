@@ -1,7 +1,6 @@
 ---
 title: Linux 入门（八）：Shell 脚本与定时任务
-published: 2026-10-26
-updated: 2026-10-26
+published: 2026-02-25
 description: 从 Bash 的变量、引号和退出状态开始，介绍条件、循环、函数与参数处理，通过系统报告脚本说明错误处理、日志和 cron 定时运行的基本方法。
 tags: [Linux, Linux入门, Bash, Shell脚本, 定时任务]
 category: Linux

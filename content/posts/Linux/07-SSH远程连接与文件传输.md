@@ -1,7 +1,6 @@
 ---
 title: Linux 入门（七）：SSH 远程连接与文件传输
-published: 2026-10-26
-updated: 2026-10-26
+published: 2026-02-23
 description: 理解 SSH 客户端与服务端、主机身份和用户认证，掌握密码与密钥登录、连接别名、文件传输和 tmux 会话，并按连接阶段排查常见问题。
 tags: [Linux, Linux入门, SSH, 文件传输, 远程管理]
 category: Linux

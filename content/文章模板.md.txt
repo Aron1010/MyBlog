@@ -2,7 +2,6 @@
 title: 文章标题
 description: 用一两句话说明这篇文章记录的问题和主要内容。
 published: 2026-10-18
-updated: 2026-10-18
 category: 生活
 tags: [随记]
 draft: true

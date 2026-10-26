@@ -8,7 +8,7 @@ Aron 的个人博客，记录后端开发、AI 编程与日常生活。以八奈
 
 ## 内容与功能
 
-源码保留 **43 篇文章**，目前公开《计算机科学导论》的前两章，Linux 入门指南 10 篇、MySQL 入门指南 9 篇、Redis 22 篇继续隐藏；杏菜集保留 **10 张动画截图**。
+源码保留 **43 篇文章**，目前公开 **21 篇**：《计算机科学导论》前两章、Linux 入门指南 10 篇、MySQL 入门指南 9 篇；Redis 22 篇继续隐藏；杏菜集保留 **10 张动画截图**。
 
 - **阅读与检索**：文章列表、分类专题、日期归档、标签筛选和全文搜索。
 - **文章阅读**：目录导航、阅读进度、代码高亮与复制、Mermaid 流程图，以及保存在本机的喜欢记录。
@@ -42,7 +42,7 @@ npm run preview
 
 ## 写作
 
-当前 `site.config.json` 中的 `showPosts` 为 `true`，`publishedPostIds` 只允许 `cs-intro-01`、`cs-intro-02` 公开。未列入名单的文章不会进入页面、搜索、RSS、站点地图或公开文章数据，原始 Markdown 保留。发布后续文章时，将新文章的 `id` 加入名单，再构建、检查并部署。设置 `showPosts: false` 可以隐藏全部文章；删除 `publishedPostIds` 字段会恢复公开所有符合条件的文章。草稿与密码排除规则始终有效。
+当前 `site.config.json` 中的 `showPosts` 为 `true`，`publishedPostIds` 包含《计算机科学导论》前两章，以及 Linux、MySQL 两套指南的全部文章。未列入名单的文章不会进入页面、搜索、RSS、站点地图或公开文章数据，原始 Markdown 保留。发布后续文章时，将新文章的 `id` 加入名单，再构建、检查并部署。设置 `showPosts: false` 可以隐藏全部文章；删除 `publishedPostIds` 字段会恢复公开所有符合条件的文章。草稿与密码排除规则始终有效。
 
 当前系列：
 
@@ -51,9 +51,9 @@ npm run preview
 
 两篇文章的封面保存在 `assets/cs-intro-01.jpg`、`assets/cs-intro-02.jpg`，正文示意图位于 `assets/diagrams/`。正文保留原笔记，另加系列导航、来源说明和自测题。
 
-[Linux 入门指南](content/posts/Linux/00-Linux入门指南.md)由一篇导读和九章正文组成，覆盖目录与文件、文本处理、软件与服务、网络资源、用户权限、SSH、Shell 脚本与定时任务、磁盘挂载与备份恢复。各章包含示例、常见问题和速查，不设置自测与练习；当前保留为本地内容，未加入公开文章名单。
+[Linux 入门指南](content/posts/Linux/00-Linux入门指南.md)由一篇导读和九章正文组成，覆盖目录与文件、文本处理、软件与服务、网络资源、用户权限、SSH、Shell 脚本与定时任务、磁盘挂载与备份恢复。各章包含示例、常见问题和速查，不设置自测与练习；已加入公开文章名单。
 
-[MySQL 入门指南](content/posts/MySQL/00-MySQL入门指南.md)由一篇导读和八章正文组成，以 MySQL 8.4、InnoDB 和统一的部门员工示例串联 DDL、增删改查、函数约束、多表查询、权限事务、索引与执行计划、视图与窗口函数、应用连接、备份恢复。各章保留示例和速查，不设置自测与练习；当前未加入公开文章名单。
+[MySQL 入门指南](content/posts/MySQL/00-MySQL入门指南.md)由一篇导读和八章正文组成，以 MySQL 8.4、InnoDB 和统一的部门员工示例串联 DDL、增删改查、函数约束、多表查询、权限事务、索引与执行计划、视图与窗口函数、应用连接、备份恢复。各章保留示例和速查，不设置自测与练习；已加入公开文章名单。
 
 在 `content/posts/分类名/` 中创建 Markdown 文件，可复制 [文章模板](content/文章模板.md.txt)，然后修改顶部的 frontmatter：
 
@@ -62,7 +62,6 @@ npm run preview
 title: 一篇新的学习笔记
 description: 记录遇到的问题、解决过程和自己的理解。
 published: 2026-10-19
-updated: 2026-10-19
 category: Linux
 tags: [Linux, 学习笔记]
 id: my-new-note
@@ -73,7 +72,7 @@ draft: false
 ---
 ```
 
-`id` 和 `permalink` 必须唯一；地址以 `/posts/` 开头、以 `/` 结尾，发布后尽量保持稳定。`published` 记录首次发布日期，修订时更新 `updated`。
+`id` 和 `permalink` 必须唯一；地址以 `/posts/` 开头、以 `/` 结尾，发布后尽量保持稳定。`published` 记录发布日期；文章页和页面元数据统一保留发布日期，不设置更新时间。
 
 尚未完成的文章可以设为 `draft: true`，或放在 `content/drafts/` 中。草稿和设置了 `password` 字段的文章会被排除，不生成公开页面。
 

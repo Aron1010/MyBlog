@@ -1,7 +1,6 @@
 ---
 title: Linux 入门指南：从终端操作到日常管理
-published: 2026-10-26
-updated: 2026-10-26
+published: 2026-02-02
 description: 面向初学者的 Linux 系列导读，从系统组成、环境准备和终端操作出发，串联文件、文本、软件、网络、权限、SSH、Shell 脚本与备份恢复九章内容。
 tags: [Linux, Linux入门, 入门指南, 学习路线, 终端]
 category: Linux

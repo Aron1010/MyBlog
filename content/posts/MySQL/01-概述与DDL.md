@@ -1,7 +1,6 @@
 ---
 title: MySQL 基础（一）：数据库概念、SQL 分类与 DDL
-published: 2026-08-07
-updated: 2026-10-26
+published: 2026-04-25
 description: 从 MySQL 服务与会话入门，理解数据库、表和 SQL 分类，使用统一的部门员工模型讲解类型选择、字符集、建表、结构查看与 DDL 变更。
 tags: [MySQL, MySQL入门, SQL, DDL, 数据类型]
 category: MySQL

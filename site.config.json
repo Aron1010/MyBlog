@@ -7,5 +7,27 @@
   "github": "https://github.com/aron1010",
   "language": "zh-CN",
   "showPosts": true,
-  "publishedPostIds": ["cs-intro-01", "cs-intro-02"]
+  "publishedPostIds": [
+    "cs-intro-01",
+    "cs-intro-02",
+    "linux-guide",
+    "linux-paths",
+    "post-2e2663493e",
+    "post-636b15a7eb",
+    "post-10ad4d4a4e",
+    "linux-network",
+    "post-a7c3fcbbe8",
+    "linux-ssh",
+    "linux-shell",
+    "linux-storage-backup",
+    "mysql-guide",
+    "mysql-ddl",
+    "post-bd1667f899",
+    "post-cf59758916",
+    "mysql-transactions",
+    "mysql-index-explain",
+    "mysql-views-cte-window",
+    "mysql-app-connections",
+    "mysql-backup-maintenance"
+  ]
 }

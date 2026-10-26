@@ -1,7 +1,6 @@
 ---
 title: MySQL 入门指南：从数据建模到日常维护
-published: 2026-10-26
-updated: 2026-10-26
+published: 2026-04-20
 description: 面向初学者的 MySQL 系列导读，以统一的部门与员工数据贯穿建表、增删改查、关联查询、权限事务、索引、窗口函数、应用连接和备份恢复。
 tags: [MySQL, MySQL入门, SQL, 入门指南, 数据建模]
 category: MySQL

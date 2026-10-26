@@ -1,7 +1,6 @@
 ---
 title: MySQL 基础（二）：DML 数据操作与 DQL 单表查询
-published: 2026-08-07
-updated: 2026-10-26
+published: 2026-05-03
 description: 用统一的部门员工数据讲解插入、更新、删除、NULL 与三值逻辑，掌握条件、聚合、分组、排序和分页，并理解查询的逻辑处理顺序。
 tags: [MySQL, MySQL入门, DML, DQL, SQL查询]
 category: MySQL

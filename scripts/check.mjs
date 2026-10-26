@@ -9,6 +9,7 @@ const context = {};
 vm.runInNewContext(fs.readFileSync(path.join(root,'assets/posts.js'),'utf8')+';this.posts=BLOG_POSTS;',context);
 const posts = context.posts;
 const sourcePosts = walk(path.join(root,'content','posts')).filter(file=>/\.mdx?$/.test(file)).map(file=>({file,...readPost(file)}));
+for (const {file,data} of sourcePosts) assert(!Object.hasOwn(data,'updated'),'文章不再设置更新时间: '+file);
 const publishedSources = sourcePosts.filter(({data})=>config.showPosts!==false && data.draft!==true && !data.password && (!config.publishedPostIds || config.publishedPostIds.includes(data.id)));
 assert.equal(posts.length,publishedSources.length,'公开文章数量应与当前内容源一致');
 for (const {file,data,markdown} of publishedSources) {
@@ -55,6 +56,9 @@ for (const post of posts) {
   const data = JSON.parse(doc.querySelector('#structured-data').textContent);
   assert.equal(data['@type'],'BlogPosting');
   assert.equal(data.datePublished.slice(0,10),post.date);
+  assert(!Object.hasOwn(data,'dateModified'),'文章结构化数据不包含更新时间: '+post.url);
+  assert(!doc.querySelector('meta[property="article:modified_time"]'),'文章元数据不包含更新时间: '+post.url);
+  assert(!/更新于|更新时间/.test(doc.querySelector('.article-attribution')?.textContent||''),'文章署名区不显示更新时间: '+post.url);
   assert(doc.querySelector('#article-body')?.textContent.length>200,'正文不得截断');
 }
 const archive=docs.get(path.join(dist,'archive/index.html'));
@@ -67,6 +71,7 @@ if (config.showPosts === false) {
   for (const [file,doc] of docs) assert.equal(doc.querySelectorAll('.blog-row,.archive-row,.article-header').length,0,'页面不得显示隐藏文章: '+file);
 }
 const rss = fs.readFileSync(path.join(dist,'rss.xml'),'utf8');
+assert(!fs.readFileSync(path.join(dist,'sitemap.xml'),'utf8').includes('<lastmod>'),'站点地图不包含更新时间');
 assert.equal((rss.match(/<item>/g)||[]).length,posts.length);
 for (const post of posts) assert(rss.includes(encodeURI(config.url+post.url)),'RSS 包含全部文章');
 for (const file of walk(dist)) assert(!/^(?:content|migration|node_modules|output)\/|sample-posts\.json|encrypted-demo/.test(path.relative(dist,file)),'公开产物不得包含草稿或备份');
