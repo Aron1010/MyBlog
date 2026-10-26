@@ -109,7 +109,7 @@ function heart(id) {
 }
 function tagLink(tag) { return `<a href="#tag/${encodeURIComponent(tag)}" class="tag">${esc(tag)}</a>`; }
 function card(e) {
-  return `<article class="blog-row"><a class="row-thumbnail" href="#post/${e.id}" aria-label="阅读：${esc(e.title)}"><img src="${imageSrc(e.image)}" alt="" loading="lazy"></a><div class="row-copy"><div class="post-meta"><a href="#category/${encodeURIComponent(e.category)}" class="category-label">${esc(e.category)}</a><span class="dot"></span><time datetime="${e.date}">${date(e.date)}</time></div><h3><a href="#post/${e.id}">${esc(e.title)}</a></h3><p>${esc(e.desc)}</p><div class="row-bottom"><div class="row-tags">${e.tags.slice(0, 2).map(tagLink).join('')}</div><span class="read-time">${e.minutes} 分钟阅读 ${heart(e.id)}</span></div></div></article>`;
+  return `<article class="blog-row"><div class="row-copy"><div class="post-meta"><a href="#category/${encodeURIComponent(e.category)}" class="category-label">${esc(e.category)}</a><span class="dot"></span><time datetime="${e.date}">${date(e.date)}</time></div><h3><a href="#post/${e.id}">${esc(e.title)}</a></h3><p>${esc(e.desc)}</p><div class="row-bottom"><div class="row-tags">${e.tags.slice(0, 2).map(tagLink).join('')}</div><span class="read-time">${e.minutes} 分钟阅读 ${heart(e.id)}</span></div></div></article>`;
 }
 function filters() {
   return `<div class="filter-row" role="group" aria-label="文章分类">${categories.map(c => `<button data-filter="${esc(c)}" class="${selected === c ? 'active' : ''}" aria-pressed="${selected === c}">${esc(c)}</button>`).join('')}</div>`;
