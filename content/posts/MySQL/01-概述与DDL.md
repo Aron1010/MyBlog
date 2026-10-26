@@ -1,14 +1,9 @@
 ---
 title: MySQL 基础（一）：数据库概念、SQL 分类与 DDL
 published: 2026-08-07
-description: 从 DB、DBMS 与 SQL 的基本概念入门，介绍 MySQL 服务启动、命令行连接和环境检查，梳理 SQL
-  分类，并详解数据库与表的创建、数据类型、结构修改及删除操作。
-tags:
-  - MySQL
-  - MySQL入门
-  - SQL
-  - DDL
-  - 数据类型
+updated: 2026-10-26
+description: 从 MySQL 服务与会话入门，理解数据库、表和 SQL 分类，使用统一的部门员工模型讲解类型选择、字符集、建表、结构查看与 DDL 变更。
+tags: [MySQL, MySQL入门, SQL, DDL, 数据类型]
 category: MySQL
 draft: false
 pinned: false
@@ -19,272 +14,237 @@ image: rooftop
 author: Aron
 ---
 
-## 1. 数据库与 MySQL 基本概念
+> [MySQL 入门指南](./00-MySQL入门指南.md) · 第一章：建立数据库与核心表结构。
 
-### 1.1 DB、DBMS 与 SQL
+本章先分清数据库、管理系统和 SQL，再创建后续章节共同使用的 `mysql_learn` 数据库、`dept` 部门表和 `emp` 员工表。示例以 MySQL 8.4、InnoDB 为主。
 
-| 概念 | 全称 | 含义 |
+## 一、数据库与关系模型
+
+| 概念 | 含义 | 示例 |
 | --- | --- | --- |
-| DB | Database | 按一定结构组织、长期存储的数据集合 |
-| DBMS | Database Management System | 创建、管理和操作数据库的软件，如 MySQL |
-| SQL | Structured Query Language | 操作关系型数据库的标准语言 |
+| DB | 按结构组织和保存的数据集合 | `mysql_learn` 数据库 |
+| DBMS | 管理数据库的软件 | MySQL |
+| SQL | 定义、查询和修改关系数据的语言 | `SELECT`、`CREATE TABLE` |
 
-MySQL 是关系型数据库管理系统。关系型数据库以二维表组织数据：
+表由行与列组成：一行描述一个对象或一次事件，一列描述一种属性。主键用于唯一标识行，外键用于表达并约束引用关系。
 
-- 一行称为一条记录。
-- 一列称为一个字段。
-- 表之间可以通过主键、外键建立关系。
-- 一个 MySQL 服务实例可以管理多个数据库，一个数据库可以包含多张表。
+一个实例可以管理多个数据库，一个数据库可以包含多张表。表的逻辑结构不等于底层文件布局，普通 SQL 操作应通过服务端完成，不直接编辑数据文件。
 
-### 1.2 MySQL 版本
+## 二、启动服务与连接实例
 
-MySQL 常见版本包括社区版和企业版。本文MySQL 8.0.26 社区版，本文 SQL 以 MySQL 8.0 语法为主。
-
-### 1.3 关系型数据库的核心特点
-
-- 数据结构统一，便于查询和维护。
-- 支持约束，以保证数据的正确性、有效性和完整性。
-- 支持事务，以保证一组操作要么全部成功，要么全部失败。
-- 使用 SQL 作为主要操作语言。
-
----
-
-## 2. MySQL 的启动、连接与基本操作
-
-### 2.1 Windows 服务启动与停止
-
-以管理员身份打开命令行：
-
-```bat
-net start mysql80
-net stop mysql80
-```
-
-`mysql80` 是资料安装示例中的服务名，实际名称取决于安装配置。
-
-### 2.2 命令行连接
+服务名取决于安装方式。Linux 的 systemd 环境中，常见名称是 `mysql.service` 或 `mysqld.service`，先确认再操作：
 
 ```bash
-mysql -h 127.0.0.1 -P 3306 -u root -p
+systemctl status mysql.service
 ```
 
-参数说明：
+Windows 中可能使用安装时指定的服务名，例如：
 
-| 参数 | 作用 |
+```bat
+net start MySQL84
+```
+
+`MySQL84` 只是名称示例。macOS 官方安装包、软件包管理器或容器也各有启动方式，不要把一种环境的服务命令当作通用入口。
+
+连接本机 TCP 服务：
+
+```bash
+mysql --protocol=TCP -h 127.0.0.1 -P 3306 -u root -p
+```
+
+| 参数 | 用途 |
 | --- | --- |
-| `-h` | MySQL 服务所在主机；本机连接时可以省略 |
-| `-P` | 端口，默认是 `3306`；注意为大写 `P` |
-| `-u` | 用户名 |
-| `-p` | 提示输入密码；不要直接把密码写在命令中 |
+| `--protocol=TCP` | 明确使用 TCP |
+| `-h` | 服务端地址 |
+| `-P` | 端口，大写 `P`，常见默认值为 3306 |
+| `-u` | 数据库用户名，不是操作系统用户名的自动映射 |
+| `-p` | 提示输入密码，不在命令行附加明文密码 |
 
-常用退出命令：
-
-```sql
-EXIT;
--- 或
-QUIT;
-```
-
-### 2.3 连接后先检查环境
+使用实际被授权的账号连接。进入后可以检查：
 
 ```sql
-SELECT VERSION();
-SELECT DATABASE();
+SELECT VERSION(), DATABASE(), CURRENT_USER();
 SHOW DATABASES;
 SHOW VARIABLES LIKE 'character_set_server';
 SHOW VARIABLES LIKE 'collation_server';
 ```
 
----
+`DATABASE()` 返回 `NULL`，通常只是尚未选择默认数据库。退出使用 `EXIT;` 或 `QUIT;`，退出前确认未完成的事务如何处理。
 
-## 3. SQL 通用语法与分类
+## 三、SQL 分类与书写方式
 
-### 3.1 通用语法
+| 类别 | 主要用途 | 常见语句 |
+| --- | --- | --- |
+| DDL | 定义对象结构 | `CREATE`、`ALTER`、`DROP`、`TRUNCATE` |
+| DML | 插入、修改、删除数据 | `INSERT`、`UPDATE`、`DELETE` |
+| 查询，常单列为 DQL | 从数据中获得结果 | `SELECT` |
+| 权限控制，常称 DCL | 管理账号与授权 | `CREATE USER`、`GRANT`、`REVOKE` |
+| 事务控制，常称 TCL | 确定提交和撤销边界 | `START TRANSACTION`、`COMMIT`、`ROLLBACK` |
 
-- SQL 可以写成一行或多行，通常以分号 `;` 结束。
-- SQL 关键字不区分大小写，但推荐关键字大写、对象名小写。
-- 使用空格和缩进提高可读性。
-- 字符串和日期通常使用单引号，例如 `'张三'`、`'2026-08-07'`。
-- 标识符与字符串含义不同。必要时可用反引号包围表名或字段名，例如 `` `order` ``。
+这些分类用于组织知识，不代表每一类都有完全相同的事务行为。尤其是 DDL，不能按普通数据修改的方式期待回滚。
 
-注释：
+字符串和日期使用单引号，标识符需要引用时使用反引号。SQL 关键字一般不区分大小写，表名的行为则受平台与配置影响，建议统一小写。
+
+## 四、先选择合适的数据类型
+
+### 整数与金额
+
+| 类型 | 字节数 | 有符号范围 | 常见用途 |
+| --- | ---: | --- | --- |
+| `TINYINT` | 1 | -128～127 | 状态、小范围计数 |
+| `SMALLINT` | 2 | -32768～32767 | 小范围整数 |
+| `MEDIUMINT` | 3 | -8388608～8388607 | 中等范围整数 |
+| `INT` | 4 | -2³¹～2³¹-1 | 一般计数和编号 |
+| `BIGINT` | 8 | -2⁶³～2⁶³-1 | 较大范围编号与计数 |
+
+`UNSIGNED` 禁止负数，并扩大正数范围。例如 `TINYINT UNSIGNED` 为 0～255。类型范围与业务范围是两件事，年龄仍可以通过约束限制为不超过 120。
+
+| 小数类型 | 特点 | 适合场景 |
+| --- | --- | --- |
+| `FLOAT`、`DOUBLE` | 近似值 | 测量、统计等允许误差的计算 |
+| `DECIMAL(M,D)` | 精确定点数 | 金额等需要十进制精度的值 |
+
+`DECIMAL(10,2)` 总计最多 10 位数字，其中 2 位小数、8 位整数。应用侧也需要使用合适的十进制类型，不能在传入数据库前就先丢失精度。
+
+### 字符串、二进制与 JSON
+
+| 类型 | 主要特点 | 选择时关注 |
+| --- | --- | --- |
+| `CHAR(n)` | 定长字符类型 | 固定长度代码，填充与比较受规则影响 |
+| `VARCHAR(n)` | 变长字符串，n 是最大字符数 | 字符集、行大小与索引长度 |
+| `TEXT` 系列 | 长文本 | 不同类型有不同字节容量 |
+| `BINARY`、`VARBINARY`、`BLOB` 系列 | 二进制数据 | 按字节保存和比较 |
+| `JSON` | 验证并保存 JSON 文档 | 适合扩展属性，不能代替所有关系建模 |
+
+工号、手机号等即使由数字构成，也可能有前导零或格式规则，通常应使用字符类型。电话号码不一定固定为 11 位，长度应按实际业务和国际号码需求确定。
+
+### 日期与时间
+
+| 类型 | 含义 | 注意点 |
+| --- | --- | --- |
+| `DATE` | 日期 | 例如入职日期 |
+| `TIME` | 时间或持续时间 | 取值范围不限于一天中的时刻 |
+| `DATETIME` | 不自动按会话时区转换的日期时间值 | 必须在业务上约定时区含义 |
+| `TIMESTAMP` | 写入和读取时受会话时区转换影响的时间值 | 范围与 `DATETIME` 不同 |
+| `YEAR` | 年份 | 用于只保存年份的场景 |
+
+`DATETIME(6)`、`TIMESTAMP(6)` 可以保存微秒精度。跨时区系统应统一存储、连接和展示策略，不能仅靠字段名称叫“时间戳”就假定所有转换已正确完成。
+
+## 五、创建数据库与核心表
+
+下面的结构供后续章节使用。需要具备相应建库建表权限，且不要在已包含业务数据的同名数据库中重复初始化。
 
 ```sql
--- 单行注释：双横线后应有空格
-# MySQL 风格单行注释
-/* 多行注释 */
-```
-
-### 3.2 SQL 分类
-
-| 分类 | 全称 | 用途 | 常见关键字 |
-| --- | --- | --- | --- |
-| DDL | Data Definition Language | 定义数据库对象 | `CREATE`、`ALTER`、`DROP`、`TRUNCATE` |
-| DML | Data Manipulation Language | 对表中数据增删改 | `INSERT`、`UPDATE`、`DELETE` |
-| DQL | Data Query Language | 查询数据 | `SELECT` |
-| DCL | Data Control Language | 用户和权限控制 | `CREATE USER`、`GRANT`、`REVOKE` |
-| TCL | Transaction Control Language | 控制事务 | `COMMIT`、`ROLLBACK`、`SAVEPOINT` |
-
----
-
-## 4. DDL：数据库和表结构
-
-### 4.1 数据库操作
-
-```sql
--- 查看所有数据库
-SHOW DATABASES;
-
--- 创建数据库；不存在时才创建
-CREATE DATABASE IF NOT EXISTS mysql_learn
+CREATE DATABASE mysql_learn
     DEFAULT CHARACTER SET utf8mb4
     COLLATE utf8mb4_0900_ai_ci;
 
--- 使用数据库
 USE mysql_learn;
 
--- 查看当前数据库
-SELECT DATABASE();
+CREATE TABLE dept (
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    name VARCHAR(50) NOT NULL,
+    PRIMARY KEY (id),
+    UNIQUE KEY uk_dept_name (name)
+) ENGINE = InnoDB;
 
--- 查看建库语句
-SHOW CREATE DATABASE mysql_learn;
-
--- 删除数据库；谨慎执行
-DROP DATABASE IF EXISTS mysql_learn;
+CREATE TABLE emp (
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    work_no VARCHAR(10) NOT NULL,
+    name VARCHAR(50) NOT NULL,
+    nickname VARCHAR(50) NULL,
+    gender VARCHAR(10) NULL,
+    age TINYINT UNSIGNED NULL,
+    email VARCHAR(100) NULL,
+    salary DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+    entry_date DATE NOT NULL,
+    status TINYINT NOT NULL DEFAULT 1,
+    work_address VARCHAR(100) NULL,
+    dept_id BIGINT UNSIGNED NULL,
+    manager_id BIGINT UNSIGNED NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+        ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    UNIQUE KEY uk_emp_work_no (work_no),
+    UNIQUE KEY uk_emp_email (email),
+    CONSTRAINT chk_emp_age CHECK (age IS NULL OR age <= 120),
+    CONSTRAINT chk_emp_salary CHECK (salary >= 0),
+    CONSTRAINT chk_emp_status CHECK (status IN (0,1)),
+    CONSTRAINT fk_emp_dept FOREIGN KEY (dept_id)
+        REFERENCES dept(id) ON DELETE SET NULL,
+    CONSTRAINT fk_emp_manager FOREIGN KEY (manager_id)
+        REFERENCES emp(id) ON DELETE SET NULL
+) ENGINE = InnoDB;
 ```
 
-`utf8mb4` 可以完整保存 Unicode 字符。排序规则决定字符串的比较和排序方式，实际项目应按业务要求统一选择。
+这里不使用 `IF NOT EXISTS` 掩盖已有对象：数据库或表已经存在时，先查看定义，确认是否确实是本套示例结构。
 
-### 4.2 表的创建与查看
+### 字符集与排序规则
 
-```sql
-CREATE TABLE employee (
-    id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT COMMENT '主键',
-    work_no VARCHAR(10) NOT NULL UNIQUE COMMENT '工号',
-    name VARCHAR(50) NOT NULL COMMENT '姓名',
-    gender CHAR(1) COMMENT '性别',
-    age TINYINT UNSIGNED COMMENT '年龄',
-    id_card CHAR(18) UNIQUE COMMENT '身份证号',
-    salary DECIMAL(10, 2) NOT NULL DEFAULT 0.00 COMMENT '薪资',
-    entry_date DATE COMMENT '入职日期',
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    CONSTRAINT chk_employee_age CHECK (age IS NULL OR age <= 120)
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4
-  COMMENT = '员工表';
-```
+`utf8mb4` 支持完整 Unicode 字符范围。排序规则控制比较与排序；`utf8mb4_0900_ai_ci` 中 `ai` 表示不区分重音，`ci` 表示不区分大小写，这也影响唯一键如何判断重复。
+
+数据库默认规则通常由新建表继承，表默认规则通常由新建字符列继承。更改默认值不会自动把所有已有列和已有数据都转换过去。
+
+### 为什么在结构里写约束
+
+工号唯一、姓名必填、薪资非负和部门引用有效，都是数据规则。数据库约束可以阻止不符合规则的写入，但它不能替代业务对“这个人能否调薪”等操作权限的判断。
+
+## 六、查看与修改结构
 
 ```sql
 SHOW TABLES;
-DESC employee;
-SHOW CREATE TABLE employee;
+DESCRIBE emp;
+SHOW CREATE TABLE emp;
+SHOW CREATE DATABASE mysql_learn;
 ```
 
-### 4.3 常用数据类型
+`SHOW CREATE TABLE` 能展示索引、约束和选项，比只看字段列表更完整。
 
-#### 4.3.1 整数类型
-
-| 类型 | 字节 | 有符号范围 | 无符号范围 | 常见用途 |
-| --- | ---: | --- | --- | --- |
-| `TINYINT` | 1 | -128 ～ 127 | 0 ～ 255 | 状态、小范围整数、年龄 |
-| `SMALLINT` | 2 | -32768 ～ 32767 | 0 ～ 65535 | 较小计数 |
-| `MEDIUMINT` | 3 | -8388608 ～ 8388607 | 0 ～ 16777215 | 中等范围整数 |
-| `INT` / `INTEGER` | 4 | -2³¹ ～ 2³¹-1 | 0 ～ 2³²-1 | 常规整数、编号 |
-| `BIGINT` | 8 | -2⁶³ ～ 2⁶³-1 | 0 ～ 2⁶⁴-1 | 大型系统主键、超大计数 |
-
-`UNSIGNED` 表示不允许负数，可扩大正数范围：
+下面的变更示例仅操作一个临时添加的备注列，不改变后续章节依赖的核心字段：
 
 ```sql
-age TINYINT UNSIGNED
+ALTER TABLE emp ADD COLUMN remark VARCHAR(100) NULL;
+ALTER TABLE emp MODIFY COLUMN remark VARCHAR(200) NULL;
+ALTER TABLE emp RENAME COLUMN remark TO note;
+ALTER TABLE emp DROP COLUMN note;
 ```
 
-#### 4.3.2 小数类型
+`MODIFY`、`CHANGE` 需要正确重述所需的列属性，不能假定所有原属性都会自动保留。类型收窄、非空约束和默认值变更，要先检查已有数据是否满足要求。
 
-| 类型 | 特点 | 适用场景 |
-| --- | --- | --- |
-| `FLOAT` | 单精度近似值 | 对精度要求不高的测量值 |
-| `DOUBLE` | 双精度近似值 | 更大范围的近似计算 |
-| `DECIMAL(M,D)` | 精确定点数 | 金额、财务数据、需要精确小数的场景 |
+结构变更可能持有元数据锁，也可能重建表。是否在线、是否立即完成取决于具体操作、版本和表条件，不能因为写法短就认定对业务没有影响。
 
-`M` 是总有效数字位数，`D` 是小数位数：
+## 七、删除、清空与事务边界
+
+以下只展示语法，**不要对贯穿示例的表执行后再期待后续章节继续可用**：
 
 ```sql
-price DECIMAL(10, 2)
+DROP TABLE example_table;
+TRUNCATE TABLE example_table;
+DELETE FROM example_table WHERE id = 10;
 ```
 
-金额不要优先使用 `FLOAT` 或 `DOUBLE`，因为二进制浮点数可能产生精度误差。
+| 操作 | 结构是否保留 | 是否能按 WHERE 过滤 | 事务特点 |
+| --- | --- | --- | --- |
+| `DROP TABLE` | 否 | 否 | 通常隐式提交，不能通过普通 ROLLBACK 恢复 |
+| `TRUNCATE TABLE` | 是 | 否 | DDL，通常隐式提交，并重置自增计数 |
+| `DELETE` | 是 | 是 | 对 InnoDB，未提交事务中的删除通常可回滚 |
 
-#### 4.3.3 字符串与二进制类型
+MySQL 的原子 DDL 主要保证支持范围内的操作在崩溃恢复时保持一致，不代表用户可以把 DDL 与普通 DML 一起随意回滚。数据安全仍需要正确的变更流程和备份。
 
-| 类型 | 特点 | 适用场景 |
-| --- | --- | --- |
-| `CHAR(n)` | 定长；不足长度时内部按定长处理 | 性别码、固定长度编号 |
-| `VARCHAR(n)` | 变长；`n` 表示最大字符数 | 姓名、地址、可变长度文本 |
-| `TINYTEXT` / `TEXT` / `MEDIUMTEXT` / `LONGTEXT` | 不同容量的长文本 | 文章、备注、长描述 |
-| `TINYBLOB` / `BLOB` / `MEDIUMBLOB` / `LONGBLOB` | 不同容量的二进制数据 | 二进制内容 |
+## 八、命令速查
 
-选择建议：
-
-- 手机号、身份证号、工号不是用于算术运算的数字，应使用字符类型。
-- `CHAR(11)` 适合固定长度手机号；姓名通常使用 `VARCHAR`。
-- 大型图片、视频通常保存到对象存储或文件系统，数据库保存路径和元数据。
-- `VARCHAR` 能保存的实际字节数受字符集和行大小限制，不能只看声明的最大字符数。
-
-#### 4.3.4 日期时间类型
-
-| 类型 | 常用格式 | 说明 |
-| --- | --- | --- |
-| `DATE` | `YYYY-MM-DD` | 日期 |
-| `TIME` | `HH:MM:SS` | 时间或持续时间 |
-| `YEAR` | `YYYY` | 年份 |
-| `DATETIME` | `YYYY-MM-DD HH:MM:SS` | 日期和时间，适合业务时间 |
-| `TIMESTAMP` | `YYYY-MM-DD HH:MM:SS` | 时间戳，常用于记录创建/更新时间 |
-
-`TIMESTAMP` 的显示会受会话时区影响；`DATETIME` 保存的是给定的日期时间值。跨时区系统应明确统一的时区策略。
-
-### 4.4 修改表结构
-
-```sql
--- 添加字段
-ALTER TABLE employee
-    ADD COLUMN nickname VARCHAR(30) COMMENT '昵称';
-
--- 修改字段类型或约束
-ALTER TABLE employee
-    MODIFY COLUMN nickname VARCHAR(50) NOT NULL COMMENT '昵称';
-
--- 同时修改字段名与定义
-ALTER TABLE employee
-    CHANGE COLUMN nickname display_name VARCHAR(50) COMMENT '显示名';
-
--- 删除字段
-ALTER TABLE employee
-    DROP COLUMN display_name;
-
--- 修改表名
-ALTER TABLE employee
-    RENAME TO emp;
-```
-
-### 4.5 删除、清空与区别
-
-```sql
--- 删除表结构和数据
-DROP TABLE IF EXISTS emp;
-
--- 保留表结构，快速清空全表数据
-TRUNCATE TABLE emp;
-
--- 保留表结构，按条件删除数据
-DELETE FROM emp WHERE id = 10;
-```
-
-| 操作 | 删除结构 | 支持 `WHERE` | 事务与回滚特征 | 常见用途 |
-| --- | --- | --- | --- | --- |
-| `DROP TABLE` | 是 | 否 | DDL，通常隐式提交 | 不再需要该表 |
-| `TRUNCATE TABLE` | 否 | 否 | DDL，通常隐式提交 | 快速清空整表 |
-| `DELETE` | 否 | 是 | DML，可在事务中回滚 | 按条件删除记录 |
-
-执行 `DROP`、`TRUNCATE` 或无 `WHERE` 的 `DELETE` 前，应先确认数据库、表名和数据备份。
+| 语句 | 用途 |
+| --- | --- |
+| `SELECT VERSION()` | 查看服务端版本 |
+| `SELECT DATABASE()` | 查看当前数据库 |
+| `USE 数据库` | 切换当前数据库 |
+| `SHOW TABLES` | 查看当前数据库的表 |
+| `DESCRIBE 表` | 查看列结构 |
+| `SHOW CREATE TABLE 表` | 查看完整建表定义 |
+| `ALTER TABLE 表 ADD COLUMN ...` | 添加列 |
+| `ALTER TABLE 表 RENAME COLUMN 旧列 TO 新列` | 重命名列 |
 
 ---
+
+上一篇：[指南导读与环境准备](./00-MySQL入门指南.md) · 下一篇：[DML 数据操作与单表查询](./02-DML与DQL.md) · [指南目录](./00-MySQL入门指南.md)。
