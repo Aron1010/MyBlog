@@ -1,3 +1,8 @@
 node_modules/
 dist/
 .DS_Store
+
+# Generated offline previews and design output
+/清风日常.html
+/晴天手帐.html
+/output/
