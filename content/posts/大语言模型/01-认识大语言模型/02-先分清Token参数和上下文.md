@@ -1,7 +1,7 @@
 ---
 title: 认识大语言模型（二）：先分清 Token、参数和上下文
 description: 先建立生成式语言模型的基本直觉，理解 Token、7B 参数量与上下文，并分清补充资料和重新训练。
-published: 2026-11-05
+published: 2026-09-21
 category: 大语言模型
 tags: [大语言模型, Token, 参数量, 上下文]
 draft: false
