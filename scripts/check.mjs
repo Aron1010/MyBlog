@@ -31,6 +31,14 @@ for (const [file,doc] of docs) {
   assert(canonical?.startsWith(config.url+'/'),'canonical 使用正式域名');
   assert(doc.querySelector('meta[name=description]')?.content,'页面应有描述');
   assert(doc.querySelector('#structured-data'),'页面应有结构化数据');
+  const tocToggle = doc.querySelector('.header [data-toggle-toc]');
+  assert(tocToggle,'顶部导航应包含目录开关: '+file);
+  assert.equal(doc.querySelectorAll('[data-toggle-toc]').length,1,'目录开关只保留在导航栏: '+file);
+  const hasToc = !!doc.querySelector('#article-toc');
+  assert.equal(tocToggle.hasAttribute('hidden'),!hasToc,'目录开关仅在有目录的文章页显示: '+file);
+  if (hasToc) for (const id of tocToggle.getAttribute('aria-controls').split(' ')) assert(doc.getElementById(id),'目录开关应关联真实目录: '+file);
+  const actions = [...doc.querySelectorAll('.nav-actions > button')].map(button=>button.id);
+  assert(actions.indexOf('toc-toggle')<actions.indexOf('music-open') && actions.indexOf('music-open')<actions.indexOf('search-open'),'导航操作顺序应为目录、音乐、搜索: '+file);
   for (const element of doc.querySelectorAll('a[href],img[src],script[src],link[href],audio[src]')) {
     const raw = element.getAttribute(element.hasAttribute('src')?'src':'href');
     if (!raw || /^(mailto:|data:|tel:)/.test(raw)) continue;

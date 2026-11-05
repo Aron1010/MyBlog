@@ -896,13 +896,20 @@ footer .footer-bottom{margin-top:0}
 /* Collection thumbnails show each complete composition, including portraits. */
 .gallery-collection .gallery-art img{object-fit:contain}
 
-/* Desktop reading controls; compact screens use the native collapsible TOC. */
-.toc-toggle{display:none}
-.article-aside[hidden]{display:none}
+/* The article-only navbar control toggles desktop and compact outlines. */
+.header .nav-actions .toc-toggle{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:44px;padding:8px 13px;border:1px solid rgba(103,154,191,.35);border-radius:22px;background:rgba(230,244,255,.8);color:#3c6686;font-size:12px;white-space:nowrap}
+.header .toc-toggle svg{width:17px;height:17px}
+.header .toc-toggle:hover{background:#dceefb}
+.header .nav-actions .toc-toggle[hidden],.article-aside[hidden],.mobile-toc[hidden]{display:none}
+@media(max-width:1050px){
+ .header .nav-actions .toc-toggle{width:40px;min-width:40px;padding:10px}
+ .header .toc-toggle-label{display:none}
+}
+@media(max-width:360px){
+ .is-reading .mobile-brand .brand-copy strong{font-size:17px;letter-spacing:1px}
+ .is-reading .mobile-brand .brand-copy small{font-size:6px;letter-spacing:.35px}
+}
 @media(min-width:821px){
- .article-breadcrumb{align-items:center}
- .toc-toggle{display:inline-flex;align-items:center;justify-content:center;margin-left:auto;min-height:44px;padding:8px 14px;border:1px solid rgba(103,154,191,.35);border-radius:22px;background:rgba(230,244,255,.8);color:#3c6686;font-size:12px;white-space:nowrap}
- .toc-toggle:hover{background:#dceefb}
  .reading-layout.toc-hidden{grid-template-columns:minmax(0,1fr);max-width:960px;margin-inline:auto}
  .reading-layout.toc-hidden>.article-wrap{grid-column:1}
 }
