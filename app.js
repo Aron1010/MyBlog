@@ -32,7 +32,8 @@ function publicLink(hash) {
 function enhanceLinks() {
   document.querySelectorAll('a[href^="#"]').forEach(a => a.setAttribute('href',publicLink(a.getAttribute('href'))));
 }
-let selected = '全部', limit = 6, activeTag = '', articleHeadings = [];
+const PAGE_SIZE = 6;
+let selected = '全部', currentPage = 1, activeTag = '', articleHeadings = [];
 let renderedHash = '', restoringView = false, scrollFrame = 0;
 const motion = () => matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth';
 function routeInfo() {
@@ -58,16 +59,15 @@ function routeInfo() {
   return {path, params, value};
 }
 function saveView() {
-  if (!window.__PRERENDER__ && !restoringView) history.replaceState({...history.state, sunny: {y: scrollY, limit}}, '');
+  if (!window.__PRERENDER__ && !restoringView) history.replaceState({...history.state, sunny: {y: scrollY}}, '');
 }
 function navigate(hash, preserveScroll = false, focusFilter = '') {
   hash = publicLink(hash);
   saveView();
   const y = preserveScroll ? scrollY : 0;
-  const state = {...history.state, sunny: {y, limit: 6}};
+  const state = {...history.state, sunny: {y}};
   if (location.hash === hash) history.replaceState(state, '', hash);
   else history.pushState(state, '', hash);
-  limit = 6;
   render(false);
   window.scrollTo({top: y, behavior: 'instant'});
   const focus = focusFilter ? [...main.querySelectorAll('[data-filter]')].find(b => b.dataset.filter === focusFilter) : main;
@@ -124,10 +124,33 @@ function sidebar() {
   return `<aside class="sidebar">${profileCard()}<div class="music-card">${BlogMusic.markup('侧边栏')}</div><section class="sidebar-block"><h3>沿着兴趣，慢慢读 <span>↗</span></h3>${categories.filter(c=>c !== '全部').map(c => `<a class="category-row" href="#category/${c}"><span>${c}</span><span>${realPosts.filter(e => e.category === c).length} 篇</span></a>`).join('')}</section><section class="sidebar-block"><h3>标签 <span>#</span></h3><div class="tag-cloud">${tags.map(tagLink).join('')}</div></section></aside>`;
 }
 function filteredPosts() { return entries.filter(e => (selected === '全部' || e.category === selected) && (!activeTag || e.tags.includes(activeTag))); }
+function pagination(totalPages) {
+  if (totalPages <= 1) return '<p class="list-end">— 读到这里，歇一小会儿 ☁ —</p>';
+  const {path, params} = routeInfo();
+  const link = (page, content, label, extra = '') => {
+    if (page === 1) params.delete('page'); else params.set('page', page);
+    const query = params.toString();
+    const href = publicLink('#' + path + (query ? '?' + query : ''));
+    return `<a class="pagination-link" data-page="${page}" href="${esc(href)}" aria-label="${label}" ${extra}>${content}</a>`;
+  };
+  const arrow = direction => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${direction === 'previous' ? 'm14 6-6 6 6 6' : 'm10 6 6 6-6 6'}"/></svg>`;
+  const previous = currentPage > 1 ? link(currentPage - 1, arrow('previous'), '上一页', 'rel="prev"') : `<span class="pagination-link is-disabled" aria-disabled="true" aria-label="上一页">${arrow('previous')}</span>`;
+  const next = currentPage < totalPages ? link(currentPage + 1, arrow('next'), '下一页', 'rel="next"') : `<span class="pagination-link is-disabled" aria-disabled="true" aria-label="下一页">${arrow('next')}</span>`;
+  const pages = [];
+  let lastPage = 0;
+  for (let page = 1; page <= totalPages; page++) {
+    if (totalPages > 7 && page !== 1 && page !== totalPages && Math.abs(page - currentPage) > 1 && !(currentPage <= 3 && page <= 5) && !(currentPage >= totalPages - 2 && page >= totalPages - 4)) continue;
+    if (lastPage && page - lastPage > 1) pages.push('<span class="pagination-ellipsis" aria-hidden="true">…</span>');
+    pages.push(page === currentPage ? `<span class="pagination-link is-current" aria-current="page" aria-label="第 ${page} 页，当前页">${page}</span>` : link(page, page, '第 ' + page + ' 页'));
+    lastPage = page;
+  }
+  return `<nav class="pagination" aria-label="文章分页">${previous}${pages.join('')}${next}</nav>`;
+}
 function diary() {
   if (!realPosts.length) return '<section id="diary-section" class="diary-section"><p class="empty">文章暂未公开。</p></section>';
   const list = filteredPosts();
-  return `<section id="diary-section" class="diary-section"><div class="diary-heading"><div class="section-top"><div><div class="kicker">NOTES, DAYS & LITTLE DISCOVERIES</div><h2 class="section-title">${activeTag ? '# ' + esc(activeTag) : selected === '全部' ? '最新文章' : esc(selected)} <span class="post-count">${list.length} 篇</span></h2></div><p class="latest-note">LATEST NOTE / <time datetime="${realPosts[0].date}">${date(realPosts[0].date)}</time></p></div>${filters()}${activeTag ? '<button id="clear-tag" class="clear-filter">清除标签筛选 ×</button>' : ''}</div><div class="diary-layout"><div class="blog-list">${list.length ? list.slice(0, limit).map(card).join('') : '<p class="empty">这个标签下暂时还没有文章。<a href="#diary">查看全部文章 ↗</a></p>'}${list.length > limit ? '<button class="more-button" id="load-more">再翻几页 ↓</button>' : '<p class="list-end">— 读到这里，歇一小会儿 ☁ —</p>'}</div>${sidebar()}</div></section>`;
+  const start = (currentPage - 1) * PAGE_SIZE;
+  return `<section id="diary-section" class="diary-section"><div class="diary-heading"><div class="section-top"><div><div class="kicker">NOTES, DAYS & LITTLE DISCOVERIES</div><h2 class="section-title">${activeTag ? '# ' + esc(activeTag) : selected === '全部' ? '最新文章' : esc(selected)} <span class="post-count">${list.length} 篇</span></h2></div><p class="latest-note">LATEST NOTE / <time datetime="${realPosts[0].date}">${date(realPosts[0].date)}</time></p></div>${filters()}${activeTag ? '<button id="clear-tag" class="clear-filter">清除标签筛选 ×</button>' : ''}</div><div class="diary-layout"><div class="blog-list">${list.length ? list.slice(start, start + PAGE_SIZE).map(card).join('') : '<p class="empty">这个标签下暂时还没有文章。<a href="#diary">查看全部文章 ↗</a></p>'}${list.length ? pagination(Math.ceil(list.length / PAGE_SIZE)) : ''}</div>${sidebar()}</div></section>`;
 }
 function photoSrc(photo, full = false) {
   const asset = full ? photo.full : photo.thumb;
@@ -223,7 +246,7 @@ function article(id) {
 function updateMetadata(view, id) {
   const post = view === 'post' ? entries.find(p => p.id === id) : null;
   const url = post?.url || (activeTag ? '/tags/' + encodeURIComponent(activeTag) + '/' : selected !== '全部' ? '/categories/' + encodeURIComponent(selected) + '/' : sectionRoutes[view] || '/');
-  const canonical = SITE_CONFIG.url + encodeURI(decodeURI(url));
+  const canonical = SITE_CONFIG.url + encodeURI(decodeURI(url)) + (currentPage > 1 && (view === 'home' || view === 'diary') ? '?page=' + currentPage : '');
   const description = post?.desc || (activeTag ? '带有“' + activeTag + '”标签的文章，共 ' + filteredPosts().length + ' 篇。' : selected !== '全部' ? selected + ' 分类的学习笔记与实践，共 ' + filteredPosts().length + ' 篇。' : SITE_CONFIG.description);
   const setMeta = (name, content, property = false) => {
     const attr = property ? 'property' : 'name';
@@ -290,6 +313,9 @@ function render(scroll = true) {
   selected = route.startsWith('category/') ? value : route === 'home' ? params.get('category') || '全部' : '全部';
   activeTag = route.startsWith('tag/') ? value : '';
   const view = route.startsWith('post/') ? 'post' : route.startsWith('category/') || route.startsWith('tag/') ? 'diary' : route;
+  const page = Number(params.get('page') || 1);
+  const totalPages = Math.max(1, Math.ceil(filteredPosts().length / PAGE_SIZE));
+  currentPage = view === 'home' || view === 'diary' ? Math.max(1, Math.min(Number.isSafeInteger(page) ? page : 1, totalPages)) : 1;
   const drawerSubnav = document.querySelector('.drawer-subnav');
   if (drawerSubnav) drawerSubnav.innerHTML = '<a href="#diary" data-nav="diary">全部文章</a>' + categories.filter(c=>c !== '全部').map(c=>`<a href="#category/${encodeURIComponent(c)}">${esc(c)}</a>`).join('');
   document.querySelectorAll('[data-nav]').forEach(a => {
@@ -315,6 +341,7 @@ function render(scroll = true) {
   const names = {home: 'Aron 的清风日常', diary: '文章', topics: '专题', archive: '文章归档', gallery: '杏菜集', about: '关于 Aron', '404':'页面未找到'};
   const title = view === 'post' ? entries.find(e => e.id === value)?.title || '文章未找到' : activeTag ? '# ' + activeTag : selected !== '全部' ? selected : names[view] || names.home;
   document.title = view === 'home' ? 'Aron 的清风日常 · 记录学习与生活' : title + ' · 清风日常';
+  if (currentPage > 1) document.title = '第 ' + currentPage + ' 页 · ' + document.title;
   updateMetadata(view, value);
   updateProgress();
 }
@@ -371,10 +398,16 @@ document.addEventListener('click', async event => {
     navigate(hash, true, category);
   }
   if (event.target.closest('#clear-tag')) navigate('#diary', true);
-  if (event.target.closest('#load-more')) {
-    const oldLimit = limit, y = scrollY;
-    limit += 6; render(false); window.scrollTo({top: y, behavior: 'instant'});
-    main.querySelectorAll('.row-copy h3 a')[oldLimit]?.focus({preventScroll: true}); saveView();
+  const pageLink = event.target.closest('a[data-page]');
+  if (pageLink && event.button === 0 && !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey) {
+    event.preventDefault();
+    navigate(pageLink.getAttribute('href'), true);
+    const heading = main.querySelector('.diary-heading');
+    heading?.setAttribute('tabindex', '-1');
+    heading?.focus({preventScroll: true});
+    heading?.scrollIntoView({behavior: 'instant', block: 'start'});
+    saveView();
+    return;
   }
   const like = event.target.closest('[data-like]');
   if (like) { const id = like.dataset.like; liked = liked.includes(id) ? liked.filter(v => v !== id) : [...liked, id]; try { localStorage.setItem('aron-sunny-hearts', JSON.stringify(liked)); } catch {} document.querySelectorAll('[data-like="' + id + '"]').forEach(b => { b.textContent = liked.includes(id) ? '♥' : '♡'; b.setAttribute('aria-pressed', String(liked.includes(id))); b.setAttribute('aria-label', liked.includes(id) ? '取消喜欢' : '喜欢这篇文章'); }); if (liked.includes(id)) toast('这一份喜欢，收好啦 ♡'); }
@@ -443,7 +476,6 @@ history.scrollRestoration = 'manual';
 window.addEventListener('popstate', () => {
   restoringView = true;
   const saved = history.state?.sunny;
-  limit = saved?.limit || 6;
   render(!saved);
   if (saved) window.scrollTo({top: saved.y, behavior: 'instant'});
   main.focus({preventScroll: true});
@@ -452,7 +484,7 @@ window.addEventListener('popstate', () => {
 });
 window.addEventListener('hashchange', () => {
   if (renderedHash === location.href) return;
-  limit = 6; render(); saveView();
+  render(); saveView();
 });
 render();
 saveView();
