@@ -132,7 +132,13 @@ function filters() {
   return `<div class="filter-row" role="group" aria-label="文章分类">${categories.map(c => `<button data-filter="${esc(c)}" class="${selected === c ? 'active' : ''}" aria-pressed="${selected === c}">${esc(c)}</button>`).join('')}</div>`;
 }
 function profileCard() {
-  return `<section class="profile-card"><img class="profile-avatar" src="${imageSrc('aron')}" alt="Aron 的头像"><h2>Hello, I'm Aron.</h2><p>持续学习，也认真生活。<br>记录后端开发、AI 编程，<br>以及折腾个人网站的点滴。</p><div class="profile-stats"><a href="#archive"><strong>${realPosts.length}</strong><span>篇文章</span></a><a href="#diary"><strong>${new Set(realPosts.map(e => e.category)).size}</strong><span>个分类</span></a><a href="#gallery"><strong>${photos.length}</strong><span>张图片</span></a></div><div class="profile-social"><a href="${esc(SITE_CONFIG.github)}" target="_blank" rel="noopener">GitHub ↗</a><a href="mailto:${esc(SITE_CONFIG.email)}">Email ↗</a></div></section>`;
+  const socialLinks = [
+    {name:'GitHub',href:SITE_CONFIG.github,external:true,icon:'<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 19c-4.3 1.3-4.3-2.5-6-3m12 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 19 4.77 5.07 5.07 0 0 0 18.91 1S17.73.65 15 2.48a13.38 13.38 0 0 0-7 0C5.27.65 4.09 1 4.09 1A5.07 5.07 0 0 0 4 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 8 18.13V22"/></svg>'},
+    {name:'Email',href:'mailto:'+SITE_CONFIG.email,icon:'<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="m3 7 9 6 9-6"/></svg>'},
+    {name:'哔哩哔哩',href:SITE_CONFIG.bilibili,external:true,icon:'<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="2" y="6" width="20" height="15" rx="4"/><path d="m7 2 3 4m7-4-3 4M7 20v2m10-2v2M7 11l2 2m8-2-2 2m-5 3 2 1 2-1"/></svg>'}
+  ];
+  const social = socialLinks.map(({name,href,icon,external}) => `<a href="${esc(href)}" aria-label="${name}" title="${name}"${external ? ' target="_blank" rel="noopener noreferrer"' : ''}>${icon}</a>`).join('');
+  return `<section class="profile-card"><img class="profile-avatar" src="${imageSrc('aron')}" alt="Aron 的头像"><h2>Hello, I'm Aron.</h2><p>持续学习，也认真生活。<br>记录后端开发、AI 编程，<br>以及折腾个人网站的点滴。</p><div class="profile-stats"><a href="#archive"><strong>${realPosts.length}</strong><span>篇文章</span></a><a href="#diary"><strong>${new Set(realPosts.map(e => e.category)).size}</strong><span>个分类</span></a><a href="#gallery"><strong>${photos.length}</strong><span>张图片</span></a></div><div class="profile-social">${social}</div></section>`;
 }
 function sidebar() {
   const counts = new Map();
